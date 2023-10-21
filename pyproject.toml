@@ -1,0 +1,38 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "hesmapy"
+authors = [
+  { name="Alexander Holas", email="alex.holas@gmx.de" },
+]
+description = "HESMA file format reader and writer"
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "jsonschema",
+]
+dynamic = ["version"]
+
+[project.urls]
+"Homepage" = "https://github.com/alexhls/hesmapy"
+"Bug Tracker" = "https://github.com/alexhls/hesmapy/issues"
+
+[tool]
+[tool.hatch.version]
+path = "src/hesmapy/__about__.py"
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/.github",
+  "/docs",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/hesmapy"]
