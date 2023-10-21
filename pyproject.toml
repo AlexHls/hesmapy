@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "hesmapy"
 authors = [
-  { name="Alexander Holas", email="alexander.holas@h-its.org" },
+  { name="Alexander Holas", email="alex.holas@gmx.de" },
 ]
 description = "HESMA file format reader and writer"
 readme = "README.md"
@@ -28,3 +28,11 @@ dynamic = ["version"]
 [tool.hatch.version]
 path = "src/hesmapy/__about__.py"
 
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/.github",
+  "/docs",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/hesmapy"]
