@@ -19,7 +19,7 @@ jobs:
         python-version: '3.11'
 
     - name: Install dependencies
-      run: pip install hatchling twine
+      run: pip install hatch twine
 
     - name: Build package
       run: hatch build
