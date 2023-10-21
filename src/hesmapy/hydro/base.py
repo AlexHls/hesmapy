@@ -30,7 +30,8 @@ class Hydro1D:
         if len(self.data) > 1:
             return False
         try:
-            validate(self.data, schema=self.schema)
-        except ValidationError:
+            obj = list(self.data.keys())[0]
+            validate(self.data[obj], schema=self.schema)
+        except ValidationError as e:
             return False
         return True
