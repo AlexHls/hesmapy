@@ -1,0 +1,6 @@
+{
+    "hydro_1d": {
+        "name": "hydro_1d",
+        "schema": "https://github.com/alexhls/hesmapy/SCHEMA.md"
+    }
+}

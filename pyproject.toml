@@ -17,6 +17,9 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dynamic = ["version"]
+dependencies = [
+    "jsonschema",
+]
 
 [project.urls]
 "Homepage" = "https://github.com/alexhls/hesmapy"
