@@ -4,7 +4,6 @@ build-backend = "hatchling.build"
 
 [project]
 name = "hesmapy"
-version = "0.1"
 authors = [
   { name="Alexander Holas", email="alexander.holas@h-its.org" },
 ]
@@ -19,9 +18,13 @@ classifiers = [
 dependencies = [
     "jsonschema",
 ]
+dynamic = ["version"]
 
 [project.urls]
 "Homepage" = "https://github.com/alexhls/hesmapy"
 "Bug Tracker" = "https://github.com/alexhls/hesmapy/issues"
 
 [tool]
+[tool.hatch.version]
+path = "src/hesmapy/__about__.py"
+
