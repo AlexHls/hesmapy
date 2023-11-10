@@ -1,6 +1,46 @@
 {
-    "hydro_1d": {
-        "name": "hydro_1d",
-        "schema": "https://github.com/alexhls/hesmapy/SCHEMA.md"
+    "merger": {
+        "name": "merger",
+        "schema": "https://github.com/astrocatalogs/schema/README.md",
+        "sources": [
+            {
+                "bibcode": "2022MNRAS.517.5260P",
+                "refernce": "Pakmor et al. (2022)",
+                "url": "https://ui.adsabs.harvard.edu/abs/2022MNRAS.517.5260P"
+            }
+        ],
+        "units": {
+            "radius": "cm",
+            "density": "g/cm^3",
+            "pressure": "g/(m*s^2)",
+            "temperature": "K",
+            "mass": "g",
+            "velocity": "cm/s",
+            "time": "s"
+        },
+        "data": [
+            {
+                "radius": 1e10,
+                "density": 1e-12,
+                "pressure": 1e5,
+                "temperature": 11000,
+                "mass": 1e10,
+                "velocity": 1e8,
+                "time": 15.0,
+                "xHe": 0.8,
+                "xNi56": 0.2
+            },
+            {
+                "radius": 1e10,
+                "density": 1e-12,
+                "pressure": 1e5,
+                "temperature": 11000,
+                "mass": 1e10,
+                "velocity": 1e8,
+                "time": 15.0,
+                "xHe1231": 0.8,
+                "xNi56": 0.2
+            }
+        ]
     }
 }
