@@ -9,6 +9,14 @@ class Hydro1D:
             "properties": {
                 "name": {"type": "string"},
                 "schema": {"type": "string"},
+                "sources": {
+                    "type": "object",
+                    "properties": {
+                        "bibcode": {"type": "string"},
+                        "reference": {"type": "string"},
+                        "url": {"type": "string"},
+                    },
+                },
             },
             "required": ["name"],
         }
@@ -32,6 +40,6 @@ class Hydro1D:
         try:
             obj = list(self.data.keys())[0]
             validate(self.data[obj], schema=self.schema)
-        except ValidationError as e:
+        except ValidationError:
             return False
         return True
