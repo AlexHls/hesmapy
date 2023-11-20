@@ -1,9 +1,8 @@
 import json
 from jsonschema import ValidationError, validate
 import plotly.graph_objects as go
-import numpy as np
 import pandas as pd
-from hesmapy.utils.plot_utils import _add_timestep_slider
+from hesmapy.utils.plot_utils import add_timestep_slider
 
 
 class Hydro1D:
@@ -51,7 +50,7 @@ class Hydro1D:
                             "time": {"type": "number"},
                             "\bx[A-Z][a-z][0-9]{0,3}\b": {"type": "number"},
                         },
-                        "required": ["radius", "density"],
+                        "required": ["radius", "density", "time"],
                     },
                 },
             },
@@ -61,17 +60,36 @@ class Hydro1D:
         self.path = path
         self.data = self._load_data()
         self.valid = self._validate_data()
-        # Set data to the first object in the data array
-        self.data = self.data[list(self.data.keys())[0]]
-        self.unique_times = self._get_unique_times()
+
+        # This is a hacky way to deal with multiple models and individual
+        # models at the same time
+        if isinstance(self.data, dict):
+            self.models = list(self.data.keys())
+        elif isinstance(self.data, list):
+            self.models = []
+            for item in self.data:
+                if isinstance(item, dict):
+                    self.models.append(list(item.keys())[0])
+                else:
+                    self.valid = False
+                    break
+            else:
+                # Put all data in a single dict so we don't have to deal with
+                # with a list of dicts
+                data = {}
+                for i, item in enumerate(self.data):
+                    data[self.models[i]] = item[self.models[i]]
+        else:
+            # This collects all the edge cases I can't think of
+            self.models = []
+            self.valid = False
 
     def _load_data(self) -> dict:
         with open(self.path) as f:
             try:
                 data = json.load(f)
             except json.decoder.JSONDecodeError:
-                # TODO Implement propper error handling
-                raise ValueError("Invalid JSON file")
+                raise IOError("Invalid JSON file")
         return data
 
     def _validate_data(self) -> bool:
@@ -86,8 +104,24 @@ class Hydro1D:
         # TODO: Check if all data has the same length
         return True
 
-    def _get_unique_times(self) -> np.ndarray:
-        unique_times = list(set([d["time"] for d in self.data["data"]]))
+    def get_unique_times(self, model: str) -> list:
+        """
+        Get the unique time steps for a model.
+        Returns an empty list if the data is invalid
+
+        Parameters
+        ----------
+        model : str
+            Model to get unique time steps for
+
+        Returns
+        -------
+        list
+        """
+
+        if not self.valid:
+            return []
+        unique_times = list(set([d["time"] for d in self.data[model]["data"]]))
         unique_times.sort()
         return unique_times
 
@@ -130,6 +164,8 @@ class Hydro1D:
 
         fig = go.Figure()
 
+        # TODO: Add support for multiple models
+
         # Split data into unique time steps
         for t in self.unique_times:
             data = self.get_data(time=t)
@@ -146,7 +182,22 @@ class Hydro1D:
         # Make 0th trace visible
         fig.data[0].visible = True
 
-        fig = _add_timestep_slider(fig)
+        if len(self.unique_times) > 1:
+            time_unit = (
+                self.data["units"]["time"] if "time" in self.data["units"] else None
+            )
+            fig = add_timestep_slider(fig, time=self.unique_times, time_unit=time_unit)
+
+        fig.update_layout(showlegend=True)
+        fig.update_layout(xaxis=dict(showexponent="all", exponentformat="e"))
+        fig.update_layout(yaxis=dict(showexponent="all", exponentformat="e"))
+
+        radius_unit = (
+            self.data["units"]["radius"]
+            if "radius" in self.data["units"]
+            else "(arb. units)"
+        )
+        fig.update_xaxes(title_text=f"Radius ({radius_unit})")
 
         if show_plot:
             fig.show()

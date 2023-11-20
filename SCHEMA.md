@@ -111,7 +111,7 @@ different physical units in the same file as it will be impossible to tell which
 ``data``:
 This field contains the actual model data. While various quantities can be provided, not all need to be present. However,
 plotting will only work for quantities that have the same length as the ``radius`` quantity. To pass the validation,
-both the ``radius`` and ``density`` field need to be present. This is again mostly to ensure that the plotting works
+the ``radius``, ``density`` and ``time`` fields need to be present. This is again mostly to ensure that the plotting works
 correctly, rather than an actual data required. Most other functionality will work if, e.g., only ``pressure``
 is given (within reason). Furthermore, at least two data points are required in a valid model.
 
@@ -123,6 +123,6 @@ is given (within reason). Furthermore, at least two data points are required in 
 | ``temperature`` | The temperature data field | String | No |
 | ``mass`` | The mass data field | String | No |
 | ``velocity`` | The velocity data field | String | No |
-| ``time`` | The time data field | String | No |
+| ``time`` | The time data field | String | Yes |
 
 For a valid example file, see the template file ``examples/hydro/hydro_1d.json``.
