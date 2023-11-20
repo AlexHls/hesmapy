@@ -113,7 +113,7 @@ This field contains the actual model data. While various quantities can be provi
 plotting will only work for quantities that have the same length as the ``radius`` quantity. To pass the validation,
 both the ``radius`` and ``density`` field need to be present. This is again mostly to ensure that the plotting works
 correctly, rather than an actual data required. Most other functionality will work if, e.g., only ``pressure``
-is given (within reason).
+is given (within reason). Furthermore, at least two data points are required in a valid model.
 
 | Field | Description | Type | Required |
 |-------|-------------|------|----------|

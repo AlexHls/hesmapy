@@ -31,14 +31,14 @@
                 "xNi56": 0.2
             },
             {
-                "radius": 1e10,
+                "radius": 2e10,
                 "density": 1e-12,
                 "pressure": 1e5,
                 "temperature": 11000,
                 "mass": 1e10,
-                "velocity": 1e8,
+                "velocity": 2e8,
                 "time": 15.0,
-                "xHe1231": 0.8,
+                "xHe": 0.8,
                 "xNi56": 0.2
             },
             {
@@ -53,14 +53,14 @@
                 "xNi56": 0.2
             },
             {
-                "radius": 1e10,
+                "radius": 2e10,
                 "density": 0.8e-12,
                 "pressure": 1e5,
                 "temperature": 10000,
                 "mass": 1e10,
-                "velocity": 1e8,
+                "velocity": 2e8,
                 "time": 25.0,
-                "xHe1231": 0.8,
+                "xHe": 0.8,
                 "xNi56": 0.2
             }
         ]
