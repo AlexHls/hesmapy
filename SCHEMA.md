@@ -71,6 +71,58 @@ creating a ``json`` file (containing the corresponding commithash), and a name k
 Each file may contain various properties:
 
 | Field | Description | Type | Required |  
-| ------|-------------|------|----------|
+|-------|-------------|------|----------|
 | ``name`` | Name of the simulation, e.g. 'wd_m090_r0' | String | Yes |   
 | ``schema`` | ``json`` schema used for the creation of the file | String | No |  
+| ``sources`` | Bibliographic resources which relate to the models stored in the file | Array | No |
+| ``units`` | Physical units of the data stored in the file. Mostly used for the correct plot label display | Object | No |
+| ``data`` | Model data containing various physical quantities and timesteps | Array | Yes |
+
+To be usable by ``hesmapy`` (in a meaningful way), a file needs to contain at least the ``name`` and ``data`` fields.
+The above listed array and object fields (``sources``, ``units``, ``data``) contain a variety of other fields as listed below:
+
+``sources``:
+A file can contain multiple sources if the data collectively was produced throughout multiple publications.
+If, however, separate subsets of data have been produced by individual publications, consider splitting up the data
+into multiple files to ensure proper attributing of each subset to an individual reference.
+
+| Field | Description | Type | Required |
+|-------|-------------|------|----------|
+| ``bibcode`` | Bibcode of the reference. Preferably in the ADS style | String | No |
+| ``reference`` | Display name of the reference, e.g. Pakmor et al. (2022) | String | No |
+| ``url`` | URL of the specified reference, preferably a DOI is provided | String | No |
+
+``units``:
+While the data itself is stored agnostic to any unit system, it can be useful to provide information on the provided units
+(especially if the data is not stored in cgs-units). This information is mostly used to display the correct labels in
+plots, if none are provided plots will only show *arb. unit*. As such it is **strongly** discouraged to store data with
+different physical units in the same file as it will be impossible to tell which data point has which unit.
+
+| Field | Description | Type | Required |
+|-------|-------------|------|----------|
+| ``radius`` | Unit of the radius data field | String | No |
+| ``density`` | Unit of the density data field | String | No |
+| ``pressure`` | Unit of the pressure data field | String | No |
+| ``temperature`` | Unit of the temperature data field | String | No |
+| ``mass`` | Unit of the mass data field | String | No |
+| ``velocity`` | Unit of the velocity data field | String | No |
+| ``time`` | Unit of the time data field | String | No |
+
+``data``:
+This field contains the actual model data. While various quantities can be provided, not all need to be present. However,
+plotting will only work for quantities that have the same length as the ``radius`` quantity. To pass the validation,
+both the ``radius`` and ``density`` field need to be present. This is again mostly to ensure that the plotting works
+correctly, rather than an actual data required. Most other functionality will work if, e.g., only ``pressure``
+is given (within reason).
+
+| Field | Description | Type | Required |
+|-------|-------------|------|----------|
+| ``radius`` | The radius data field | String | Yes |
+| ``density`` | The density data field | String | Yes |
+| ``pressure`` | The pressure data field | String | No |
+| ``temperature`` | The temperature data field | String | No |
+| ``mass`` | The mass data field | String | No |
+| ``velocity`` | The velocity data field | String | No |
+| ``time`` | The time data field | String | No |
+
+For a valid example file, see the template file ``examples/hydro/hydro_1d.json``.
