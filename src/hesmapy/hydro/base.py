@@ -2,7 +2,12 @@ import json
 from jsonschema import ValidationError, validate
 import plotly.graph_objects as go
 import pandas as pd
-from hesmapy.utils.plot_utils import add_timestep_slider
+from hesmapy.utils.plot_utils import (
+    add_timestep_slider,
+    plot_hydro_traces,
+    add_log_axis_buttons,
+)
+from hesmapy.hydro.utils import normalize_hydro1d_data
 
 
 class Hydro1D:
@@ -134,7 +139,7 @@ class Hydro1D:
         unique_times.sort()
         return unique_times
 
-    def get_data(self, time: float = None) -> pd.DataFrame:
+    def get_data(self, time: float = None, model: str = None) -> pd.DataFrame:
         """
         Get the data for a specific time step
 
@@ -142,6 +147,8 @@ class Hydro1D:
         ----------
         time : float, optional
             Time step to get data for, by default None
+        model : str, optional
+            Model to get data for, by default None
 
         Returns
         -------
@@ -150,10 +157,14 @@ class Hydro1D:
         if not self.valid:
             raise NotImplementedError("Getting data of invalid data not implemented")
 
-        if time is None:
-            return pd.DataFrame(self.data["data"])
+        if model is None:
+            model = self.models[0]
+        df = pd.DataFrame(self.data[model]["data"])
 
-        return pd.DataFrame(self.data["data"]).query(f"time == {time}")
+        if time is None:
+            return df
+
+        return df[df["time"] == time]
 
     def plot(self, show_plot=False) -> go.Figure:
         """
@@ -174,36 +185,38 @@ class Hydro1D:
         fig = go.Figure()
 
         # TODO: Add support for multiple models
+        model = self.models[0]
+        unique_times = self.get_unique_times(model=model)
 
         # Split data into unique time steps
-        for t in self.unique_times:
-            data = self.get_data(time=t)
-            fig.add_trace(
-                go.Scatter(
-                    visible=False,
-                    x=data["radius"],
-                    y=data["density"],
-                    name="Density",
-                    line=dict(color="#33CFA5"),
-                )
-            )
+        for t in unique_times:
+            data = self.get_data(time=t, model=model)
+            data = normalize_hydro1d_data(data)
+            num_data = plot_hydro_traces(fig, data)
 
         # Make 0th trace visible
-        fig.data[0].visible = True
+        for i in range(num_data):
+            fig.data[i].visible = True
 
-        if len(self.unique_times) > 1:
+        if len(unique_times) > 1:
             time_unit = (
-                self.data["units"]["time"] if "time" in self.data["units"] else None
+                self.data[model]["units"]["time"]
+                if "time" in self.data[model]["units"]
+                else None
             )
-            fig = add_timestep_slider(fig, time=self.unique_times, time_unit=time_unit)
+            fig = add_timestep_slider(
+                fig, time=unique_times, time_unit=time_unit, num_data=num_data
+            )
 
         fig.update_layout(showlegend=True)
         fig.update_layout(xaxis=dict(showexponent="all", exponentformat="e"))
         fig.update_layout(yaxis=dict(showexponent="all", exponentformat="e"))
 
+        fig = add_log_axis_buttons(fig, axis="both")
+
         radius_unit = (
-            self.data["units"]["radius"]
-            if "radius" in self.data["units"]
+            self.data[model]["units"]["radius"]
+            if "radius" in self.data[model]["units"]
             else "(arb. units)"
         )
         fig.update_xaxes(title_text=f"Radius ({radius_unit})")
