@@ -166,6 +166,72 @@ class Hydro1D:
 
         return df[df["time"] == time]
 
+    def get_units(self, model: str = None) -> dict:
+        """
+        Get the units for a model
+
+        Parameters
+        ----------
+        model : str, optional
+            Model to get units for, by default None
+
+        Returns
+        -------
+        dict
+        """
+        if not self.valid:
+            raise NotImplementedError("Getting units of invalid data not implemented")
+
+        if model is None:
+            model = self.models[0]
+
+        radius_unit = (
+            self.data[model]["units"]["radius"]
+            if "radius" in self.data[model]["units"]
+            else "(arb. units)"
+        )
+        density_unit = (
+            self.data[model]["units"]["density"]
+            if "density" in self.data[model]["units"]
+            else "(arb. units)"
+        )
+        pressure_unit = (
+            self.data[model]["units"]["pressure"]
+            if "pressure" in self.data[model]["units"]
+            else "(arb. units)"
+        )
+        temperature_unit = (
+            self.data[model]["units"]["temperature"]
+            if "temperature" in self.data[model]["units"]
+            else "(arb. units)"
+        )
+        mass_unit = (
+            self.data[model]["units"]["mass"]
+            if "mass" in self.data[model]["units"]
+            else "(arb. units)"
+        )
+        velocity_unit = (
+            self.data[model]["units"]["velocity"]
+            if "velocity" in self.data[model]["units"]
+            else "(arb. units)"
+        )
+        time_unit = (
+            self.data[model]["units"]["time"]
+            if "time" in self.data[model]["units"]
+            else "(arb. units)"
+        )
+        units = {
+            "radius": radius_unit,
+            "density": density_unit,
+            "pressure": pressure_unit,
+            "temperature": temperature_unit,
+            "mass": mass_unit,
+            "velocity": velocity_unit,
+            "time": time_unit,
+        }
+
+        return units
+
     def plot(self, show_plot=False) -> go.Figure:
         """
         Plot the data
@@ -187,25 +253,21 @@ class Hydro1D:
         # TODO: Add support for multiple models
         model = self.models[0]
         unique_times = self.get_unique_times(model=model)
+        units = self.get_units(model=model)
 
         # Split data into unique time steps
         for t in unique_times:
             data = self.get_data(time=t, model=model)
-            data = normalize_hydro1d_data(data)
-            num_data = plot_hydro_traces(fig, data)
+            data, normalization_factors = normalize_hydro1d_data(data)
+            num_data = plot_hydro_traces(fig, data, units, normalization_factors)
 
         # Make 0th trace visible
         for i in range(num_data):
             fig.data[i].visible = True
 
         if len(unique_times) > 1:
-            time_unit = (
-                self.data[model]["units"]["time"]
-                if "time" in self.data[model]["units"]
-                else None
-            )
             fig = add_timestep_slider(
-                fig, time=unique_times, time_unit=time_unit, num_data=num_data
+                fig, time=unique_times, time_unit=units["time"], num_data=num_data
             )
 
         fig.update_layout(showlegend=True)
@@ -214,12 +276,8 @@ class Hydro1D:
 
         fig = add_log_axis_buttons(fig, axis="both")
 
-        radius_unit = (
-            self.data[model]["units"]["radius"]
-            if "radius" in self.data[model]["units"]
-            else "(arb. units)"
-        )
-        fig.update_xaxes(title_text=f"Radius ({radius_unit})")
+        fig.update_xaxes(title_text=f"Radius ({units['radius']})")
+        fig.update_yaxes(title_text="Normalized data")
 
         if show_plot:
             fig.show()

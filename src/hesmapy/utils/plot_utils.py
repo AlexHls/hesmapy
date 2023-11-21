@@ -93,7 +93,7 @@ def add_log_axis_buttons(fig: go.Figure, axis: str = "both") -> go.Figure:
         ),
         pad={},
         showactive=True,
-        x=0.06,
+        x=0.26,
         xanchor="left",
         y=1.15,
         yanchor="top",
@@ -111,7 +111,7 @@ def add_log_axis_buttons(fig: go.Figure, axis: str = "both") -> go.Figure:
         ),
         pad={},
         showactive=True,
-        x=0.06,
+        x=0.26,
         xanchor="left",
         y=1.1,
         yanchor="top",
@@ -119,7 +119,7 @@ def add_log_axis_buttons(fig: go.Figure, axis: str = "both") -> go.Figure:
     x_labels = dict(
         text="X-Axis scale",
         showarrow=False,
-        x=0,
+        x=0.2,
         y=1.14,
         xref="paper",
         yref="paper",
@@ -128,7 +128,7 @@ def add_log_axis_buttons(fig: go.Figure, axis: str = "both") -> go.Figure:
     y_labels = dict(
         text="Y-Axis scale",
         showarrow=False,
-        x=0,
+        x=0.2,
         y=1.09,
         xref="paper",
         yref="paper",
@@ -147,7 +147,9 @@ def add_log_axis_buttons(fig: go.Figure, axis: str = "both") -> go.Figure:
     return fig
 
 
-def plot_hydro_traces(fig: go.Figure, data: dict) -> int:
+def plot_hydro_traces(
+    fig: go.Figure, data: dict, units: dict, normalization_factors: dict = None
+) -> int:
     """
     Plot hydro data
 
@@ -157,12 +159,31 @@ def plot_hydro_traces(fig: go.Figure, data: dict) -> int:
         Figure to add traces to
     data : dict
         Data to plot
+    units : dict
+        Units of data
+    normalization_factors : dict, optional
+        Normalization factors, by default None
+
 
     Returns
     -------
     int
     """
+    if normalization_factors is None:
+        normalization_factors = {
+            "density": 1,
+            "pressure": 1,
+            "temperature": 1,
+            "mass": 1,
+            "velocity": 1,
+        }
     num_data = 1
+    hovertemplate = (
+        "Density: %{customdata:.2e}"
+        + f" {units['density']}<br>Radius"
+        + "%{x:.2e}"
+        + f" {units['radius']}<br>"
+    )
     fig.add_trace(
         go.Scatter(
             visible=False,
@@ -170,9 +191,17 @@ def plot_hydro_traces(fig: go.Figure, data: dict) -> int:
             y=data["density"],
             name="Density",
             line=dict(color="#33CFA5"),
+            customdata=data["density"] * normalization_factors["density"],
+            hovertemplate=hovertemplate,
         )
     )
     if "pressure" in data:
+        hovertemplate = (
+            "Pressure: %{customdata:.2e}"
+            + f" {units['pressure']}<br>Radius"
+            + "%{x:.2e}"
+            + f" {units['radius']}<br>"
+        )
         fig.add_trace(
             go.Scatter(
                 visible=False,
@@ -180,10 +209,18 @@ def plot_hydro_traces(fig: go.Figure, data: dict) -> int:
                 y=data["pressure"],
                 name="Pressure",
                 line=dict(color="#F06A6A"),
+                customdata=data["pressure"] * normalization_factors["pressure"],
+                hovertemplate=hovertemplate,
             )
         )
         num_data += 1
     if "temperature" in data:
+        hovertemplate = (
+            "Temperature: %{customdata:.2e}"
+            + f" {units['temperature']}<br>Radius"
+            + "%{x:.2e}"
+            + f" {units['radius']}<br>"
+        )
         fig.add_trace(
             go.Scatter(
                 visible=False,
@@ -191,10 +228,18 @@ def plot_hydro_traces(fig: go.Figure, data: dict) -> int:
                 y=data["temperature"],
                 name="Temperature",
                 line=dict(color="#F3A431"),
+                customdata=data["temperature"] * normalization_factors["temperature"],
+                hovertemplate=hovertemplate,
             )
         )
         num_data += 1
     if "mass" in data:
+        hovertemplate = (
+            "Mass: %{customdata:.2e}"
+            + f" {units['mass']}<br>Radius"
+            + "%{x:.2e}"
+            + f" {units['radius']}<br>"
+        )
         fig.add_trace(
             go.Scatter(
                 visible=False,
@@ -202,10 +247,18 @@ def plot_hydro_traces(fig: go.Figure, data: dict) -> int:
                 y=data["mass"],
                 name="Mass",
                 line=dict(color="#6A6AF0"),
+                customdata=data["mass"] * normalization_factors["mass"],
+                hovertemplate=hovertemplate,
             )
         )
         num_data += 1
     if "velocity" in data:
+        hovertemplate = (
+            "Velocity: %{customdata:.2e}"
+            + f" {units['velocity']}<br>Radius"
+            + "%{x:.2e}"
+            + f" {units['radius']}<br>"
+        )
         fig.add_trace(
             go.Scatter(
                 visible=False,
@@ -213,6 +266,8 @@ def plot_hydro_traces(fig: go.Figure, data: dict) -> int:
                 y=data["velocity"],
                 name="Velocity",
                 line=dict(color="#F06A6A"),
+                customdata=data["velocity"] * normalization_factors["velocity"],
+                hovertemplate=hovertemplate,
             )
         )
         num_data += 1
