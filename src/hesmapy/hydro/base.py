@@ -61,12 +61,15 @@ class Hydro1D:
         self.data = self._load_data()
         self.valid = self._validate_data()
 
+        self.models = []
+        self.multi_model = self._multiple_models()
+
+    def _multiple_models(self) -> bool:
         # This is a hacky way to deal with multiple models and individual
         # models at the same time
         if isinstance(self.data, dict):
             self.models = list(self.data.keys())
         elif isinstance(self.data, list):
-            self.models = []
             for item in self.data:
                 if isinstance(item, dict):
                     self.models.append(list(item.keys())[0])
@@ -78,11 +81,17 @@ class Hydro1D:
                 # with a list of dicts
                 data = {}
                 for i, item in enumerate(self.data):
-                    data[self.models[i]] = item[self.models[i]]
+                    modelname = self.models[i]
+                    # Avoid duplicate keys
+                    if modelname in data:
+                        modelname = f"{modelname}_{i}"
+                    data[modelname] = item[self.models[i]]
+                    self.models[i] = modelname
         else:
             # This collects all the edge cases I can't think of
             self.models = []
             self.valid = False
+        return len(self.models) > 1
 
     def _load_data(self) -> dict:
         with open(self.path) as f:
