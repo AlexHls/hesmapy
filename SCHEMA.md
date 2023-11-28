@@ -126,3 +126,8 @@ is given (within reason). Furthermore, at least two data points are required in 
 | ``time`` | The time data field | String | Yes |
 
 For a valid example file, see the template file ``examples/hydro/hydro_1d.json``.
+
+*Note*: It might seem a little unintuitive to store the data in a 'per data point' scheme instead of an array based approach.
+However, this approach is much more robust in terms of missing data and unevenly shaped data. In particular when it comes
+to creating the interactive plots or DataFrames, this approach allows to just fill missing points with NaN values, instead
+of having to deal with unevenly shaped arrays.
