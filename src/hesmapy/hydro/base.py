@@ -64,10 +64,14 @@ class Hydro1D:
 
         self.path = path
         self.data = self._load_data()
-        self.valid = self._validate_data()
+
+        # Naively assume that the data is valid
+        self.valid = True
 
         self.models = []
         self.multi_model = self._multiple_models()
+
+        self.valid = self._validate_data()
 
     def _multiple_models(self) -> bool:
         # This is a hacky way to deal with multiple models and individual
@@ -107,13 +111,11 @@ class Hydro1D:
         return data
 
     def _validate_data(self) -> bool:
-        if len(self.data) > 1:
-            return False
-        try:
-            obj = list(self.data.keys())[0]
-            validate(self.data[obj], schema=self.schema)
-        except ValidationError:
-            return False
+        for model in self.models:
+            try:
+                validate(self.data[model], schema=self.schema)
+            except ValidationError:
+                return False
 
         # TODO: Check if all data has the same length
         return True
