@@ -9,6 +9,7 @@ from hesmapy.utils.plot_utils import (
     plot_abundance_traces,
 )
 from hesmapy.hydro.utils import normalize_hydro1d_data, get_abundance_data
+from hesmapy.constants import HYDRO1D_ABUNDANCE_REGEX
 
 
 class Hydro1D:
@@ -54,7 +55,7 @@ class Hydro1D:
                             "mass": {"type": "number"},
                             "velocity": {"type": "number"},
                             "time": {"type": "number"},
-                            "\bx[A-Z][a-z][0-9]{0,3}\b": {"type": "number"},
+                            HYDRO1D_ABUNDANCE_REGEX: {"type": "number"},
                         },
                         "required": ["radius", "density", "time"],
                     },

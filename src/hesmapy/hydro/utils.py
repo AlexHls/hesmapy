@@ -2,6 +2,8 @@
 import pandas as pd
 import numpy as np
 
+from hesmapy.constants import HYDRO1D_ABUNDANCE_REGEX
+
 
 def normalize_hydro1d_data(data: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     """
@@ -58,7 +60,7 @@ def get_abundance_data(data: pd.DataFrame, max_abundances: int) -> pd.DataFrame:
     Returns
     pd.DataFrame
     """
-    abundances = data.filter(regex=r"\bx[A-Z][a-z][0-9]{0,3}\b")
+    abundances = data.filter(regex=HYDRO1D_ABUNDANCE_REGEX)
 
     if abundances.empty:
         return abundances
@@ -72,6 +74,7 @@ def get_abundance_data(data: pd.DataFrame, max_abundances: int) -> pd.DataFrame:
         masses = data["density"] * volumes
 
     total_mass = abundances.mul(masses, axis=0).sum().sort_values(ascending=False)
+    print(total_mass)
 
     # Get the top max_abundances elements
     abundances = abundances[total_mass.head(max_abundances).index]

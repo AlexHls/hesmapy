@@ -125,6 +125,7 @@ is given (within reason). Furthermore, at least two data points are required in 
 | ``velocity`` | The velocity data field | String | No |
 | ``time`` | The time data field | String | Yes |
 
+In addition, various abundances can be specified. Here the field names need to follow the regular expression ``\bx[a-zA-Z]{1,2}[0-9]{0,3}\b``, i.e. combinations of one or two letters followed by up to three integers, with a 'x' suffix. E.g. ``xNi56``, ``xC12`` and ``xHe`` are valid abundance fields.
 For a valid example file, see the template file ``examples/hydro/hydro_1d.json``.
 
 *Note*: It might seem a little unintuitive to store the data in a 'per data point' scheme instead of an array based approach.
