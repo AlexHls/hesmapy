@@ -1,4 +1,4 @@
-from hesmapy.hydro.base import Hydro1D
+from hesmapy.hydro.hydro1d import Hydro1D
 
 
 def load_hydro_1d(path):

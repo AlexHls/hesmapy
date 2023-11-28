@@ -3,7 +3,7 @@ import os
 import json
 from tempfile import NamedTemporaryFile
 import pandas as pd
-from hesmapy.hydro.base import Hydro1D
+from hesmapy.hydro.hydro1d import Hydro1D
 
 
 class TestHydro1D(unittest.TestCase):
