@@ -9,60 +9,12 @@ from hesmapy.utils.plot_utils import (
     plot_abundance_traces,
 )
 from hesmapy.hydro.utils import normalize_hydro1d_data, get_abundance_data
-from hesmapy.constants import HYDRO1D_ABUNDANCE_REGEX
+from hesmapy.constants import HYDRO1D_JSON_SCHEMA
 
 
 class Hydro1D:
     def __init__(self, path) -> None:
-        self.schema = {
-            "type": "object",
-            "properties": {
-                "name": {"type": "string"},
-                "schema": {"type": "string"},
-                "sources": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "bibcode": {"type": "string"},
-                            "reference": {"type": "string"},
-                            "url": {"type": "string"},
-                        },
-                    },
-                },
-                "units": {
-                    "type": "object",
-                    "properties": {
-                        "radius": {"type": "string"},
-                        "density": {"type": "string"},
-                        "pressure": {"type": "string"},
-                        "temperature": {"type": "string"},
-                        "mass": {"type": "string"},
-                        "velocity": {"type": "string"},
-                        "time": {"type": "string"},
-                    },
-                },
-                "data": {
-                    "type": "array",
-                    "minItems": 2,
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "radius": {"type": "number"},
-                            "density": {"type": "number"},
-                            "pressure": {"type": "number"},
-                            "temperature": {"type": "number"},
-                            "mass": {"type": "number"},
-                            "velocity": {"type": "number"},
-                            "time": {"type": "number"},
-                            HYDRO1D_ABUNDANCE_REGEX: {"type": "number"},
-                        },
-                        "required": ["radius", "density", "time"],
-                    },
-                },
-            },
-            "required": ["name", "data"],
-        }
+        self.schema = HYDRO1D_JSON_SCHEMA
 
         self.path = path
         self.data = self._load_data()
