@@ -91,6 +91,14 @@ class TestHydro1D(unittest.TestCase):
         os.unlink(path)
         self.assertTrue(hydro.valid)
 
+    def test_validate_data_invalid_multiple_objects(self):
+        with NamedTemporaryFile(mode="w", delete=False) as f:
+            json.dump([self.valid_data, self.invalid_data], f)
+            path = f.name
+        hydro = Hydro1D(path)
+        os.unlink(path)
+        self.assertFalse(hydro.valid)
+
 
 if __name__ == "__main__":
     unittest.main()
