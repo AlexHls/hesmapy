@@ -6,8 +6,9 @@ from hesmapy.utils.plot_utils import (
     add_timestep_slider,
     plot_hydro_traces,
     add_log_axis_buttons,
+    plot_abundance_traces,
 )
-from hesmapy.hydro.utils import normalize_hydro1d_data
+from hesmapy.hydro.utils import normalize_hydro1d_data, get_abundance_data
 
 
 class Hydro1D:
@@ -121,15 +122,29 @@ class Hydro1D:
         # TODO: Check if all data has the same length
         return True
 
-    def get_unique_times(self, model: str) -> list:
+    def _get_model(self, model: str | int = None) -> str:
+        if model is None:
+            model = self.models[0]
+        elif isinstance(model, int):
+            assert model < len(self.models), "Invalid model index"
+            model = self.models[model]
+        elif isinstance(model, str):
+            assert model in self.models, "Invalid model name"
+        else:
+            raise TypeError("Invalid model type")
+        return model
+
+    def get_unique_times(self, model: str | int) -> list:
         """
         Get the unique time steps for a model.
         Returns an empty list if the data is invalid
 
         Parameters
         ----------
-        model : str
-            Model to get unique time steps for
+        model : str | int, optional
+            Model to plot, by default None. Accepts either the model name or
+            the index of the model in the list of models. If model is None,
+            the first model is plotted
 
         Returns
         -------
@@ -138,11 +153,12 @@ class Hydro1D:
 
         if not self.valid:
             return []
+        model = self._get_model(model=model)
         unique_times = list(set([d["time"] for d in self.data[model]["data"]]))
         unique_times.sort()
         return unique_times
 
-    def get_data(self, time: float = None, model: str = None) -> pd.DataFrame:
+    def get_data(self, time: float = None, model: str | int = None) -> pd.DataFrame:
         """
         Get the data for a specific time step
 
@@ -150,8 +166,10 @@ class Hydro1D:
         ----------
         time : float, optional
             Time step to get data for, by default None
-        model : str, optional
-            Model to get data for, by default None
+        model : str | int, optional
+            Model to plot, by default None. Accepts either the model name or
+            the index of the model in the list of models. If model is None,
+            the first model is plotted
 
         Returns
         -------
@@ -160,8 +178,7 @@ class Hydro1D:
         if not self.valid:
             raise NotImplementedError("Getting data of invalid data not implemented")
 
-        if model is None:
-            model = self.models[0]
+        model = self._get_model(model=model)
         df = pd.DataFrame(self.data[model]["data"])
 
         if time is None:
@@ -169,14 +186,16 @@ class Hydro1D:
 
         return df[df["time"] == time]
 
-    def get_units(self, model: str = None) -> dict:
+    def get_units(self, model: str | int = None) -> dict:
         """
         Get the units for a model
 
         Parameters
         ----------
-        model : str, optional
-            Model to get units for, by default None
+        model : str | int, optional
+            Model to plot, by default None. Accepts either the model name or
+            the index of the model in the list of models. If model is None,
+            the first model is plotted
 
         Returns
         -------
@@ -185,8 +204,7 @@ class Hydro1D:
         if not self.valid:
             raise NotImplementedError("Getting units of invalid data not implemented")
 
-        if model is None:
-            model = self.models[0]
+        model = self._get_model(model=model)
 
         radius_unit = (
             self.data[model]["units"]["radius"]
@@ -235,7 +253,9 @@ class Hydro1D:
 
         return units
 
-    def plot(self, model: str | int = None, show_plot: bool = False) -> go.Figure:
+    def plot(
+        self, model: str | int = None, show_plot: bool = False, max_abundances: int = 5
+    ) -> go.Figure:
         """
         Plot the data
 
@@ -247,6 +267,9 @@ class Hydro1D:
             the first model is plotted
         show_plot : bool, optional
             Show the plot, by default False
+        max_abundances : int, optional
+            Maximum number of abundances to plot, by default 5. Abundances will
+            be plotted in order of decreasing abundance
 
         Returns
         -------
@@ -255,15 +278,9 @@ class Hydro1D:
         if not self.valid:
             raise NotImplementedError("Plotting of invalid data not implemented")
 
-        if model is None:
-            model = self.models[0]
-        elif isinstance(model, int):
-            assert model < len(self.models), "Invalid model index"
-            model = self.models[model]
-        elif isinstance(model, str):
-            assert model in self.models, "Invalid model name"
-        else:
-            raise TypeError("Invalid model type")
+        assert isinstance(max_abundances, int), "max_abundances must be an integer"
+
+        model = self._get_model(model=model)
 
         fig = go.Figure()
 
@@ -276,6 +293,11 @@ class Hydro1D:
             data = self.get_data(time=t, model=model)
             data, normalization_factors = normalize_hydro1d_data(data)
             num_data = plot_hydro_traces(fig, data, units, normalization_factors)
+            if max_abundances > 0:
+                abundance_data = get_abundance_data(data, max_abundances)
+                if abundance_data.empty:
+                    continue
+                num_data += plot_abundance_traces(fig, abundance_data, data, units)
 
         # Make 0th trace visible
         for j in range(num_data):

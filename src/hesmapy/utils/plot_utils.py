@@ -1,5 +1,15 @@
 # Purpose: Utility functions for plotting
 import plotly.graph_objects as go
+import pandas as pd
+
+
+ABUNDANCE_COLORS = [
+    "#8C564B",
+    "#E377C2",
+    "#7F7F7F",
+    "#BCBD22",
+    "#17BECF",
+]  # Colors for abundance traces
 
 
 def add_timestep_slider(
@@ -148,7 +158,7 @@ def add_log_axis_buttons(fig: go.Figure, axis: str = "both") -> go.Figure:
 
 
 def plot_hydro_traces(
-    fig: go.Figure, data: dict, units: dict, normalization_factors: dict = None
+    fig: go.Figure, data: pd.DataFrame, units: dict, normalization_factors: dict = None
 ) -> int:
     """
     Plot hydro data
@@ -157,7 +167,7 @@ def plot_hydro_traces(
     ----------
     fig : go.Figure
         Figure to add traces to
-    data : dict
+    data : pd.DataFrame
         Data to plot
     units : dict
         Units of data
@@ -180,7 +190,7 @@ def plot_hydro_traces(
     num_data = 1
     hovertemplate = (
         "Density: %{customdata:.2e}"
-        + f" {units['density']}<br>Radius"
+        + f" {units['density']}<br>Radius: "
         + "%{x:.2e}"
         + f" {units['radius']}<br>"
     )
@@ -198,7 +208,7 @@ def plot_hydro_traces(
     if "pressure" in data:
         hovertemplate = (
             "Pressure: %{customdata:.2e}"
-            + f" {units['pressure']}<br>Radius"
+            + f" {units['pressure']}<br>Radius: "
             + "%{x:.2e}"
             + f" {units['radius']}<br>"
         )
@@ -217,7 +227,7 @@ def plot_hydro_traces(
     if "temperature" in data:
         hovertemplate = (
             "Temperature: %{customdata:.2e}"
-            + f" {units['temperature']}<br>Radius"
+            + f" {units['temperature']}<br>Radius: "
             + "%{x:.2e}"
             + f" {units['radius']}<br>"
         )
@@ -236,7 +246,7 @@ def plot_hydro_traces(
     if "mass" in data:
         hovertemplate = (
             "Mass: %{customdata:.2e}"
-            + f" {units['mass']}<br>Radius"
+            + f" {units['mass']}<br>Radius: "
             + "%{x:.2e}"
             + f" {units['radius']}<br>"
         )
@@ -255,7 +265,7 @@ def plot_hydro_traces(
     if "velocity" in data:
         hovertemplate = (
             "Velocity: %{customdata:.2e}"
-            + f" {units['velocity']}<br>Radius"
+            + f" {units['velocity']}<br>Radius: "
             + "%{x:.2e}"
             + f" {units['radius']}<br>"
         )
@@ -271,5 +281,49 @@ def plot_hydro_traces(
             )
         )
         num_data += 1
+
+    return num_data
+
+
+def plot_abundance_traces(
+    fig: go.Figure, abundance_data: pd.DataFrame, data: pd.DataFrame, units: dict
+) -> int:
+    """
+    Plot abundance data
+
+    Parameters
+    ----------
+    fig : go.Figure
+        Figure to add traces to
+    abundance_data : pd.DataFrame
+        Abundance data to plot
+    data : pd.DataFrame
+        Hydro data
+    units : dict
+        Units of data
+
+    Returns
+    -------
+    int
+    """
+    num_data = len(abundance_data.columns)
+    for i, index in enumerate(abundance_data.columns):
+        hovertemplate = (
+            f"{index}"
+            + ": %{y:.2e}"
+            + "<br>Radius: "
+            + "%{x:.2e}"
+            + f" {units['radius']}<br>"
+        )
+        fig.add_trace(
+            go.Scatter(
+                visible=False,
+                x=data["radius"],
+                y=abundance_data[index],
+                name=index,
+                line=dict(color=ABUNDANCE_COLORS[i % len(ABUNDANCE_COLORS)]),
+                hovertemplate=hovertemplate,
+            )
+        )
 
     return num_data
