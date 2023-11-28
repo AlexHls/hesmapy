@@ -62,7 +62,7 @@ creating a ``json`` file (containing the corresponding commithash), and a name k
 ```json
 {
     "hydro_sim_name": {
-        "schema": "https://github.com/AlexHls/hesmapy/blob/initial/SCHEMA.md"
+        "schema": "https://github.com/AlexHls/hesmapy/blob/v0.2.0/SCHEMA.md"
         "name": "hydro_sim_name"
     }
 }
