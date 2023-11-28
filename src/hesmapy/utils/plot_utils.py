@@ -190,7 +190,7 @@ def plot_hydro_traces(
             x=data["radius"],
             y=data["density"],
             name="Density",
-            line=dict(color="#33CFA5"),
+            line=dict(color="#1F77B4"),
             customdata=data["density"] * normalization_factors["density"],
             hovertemplate=hovertemplate,
         )
@@ -208,7 +208,7 @@ def plot_hydro_traces(
                 x=data["radius"],
                 y=data["pressure"],
                 name="Pressure",
-                line=dict(color="#F06A6A"),
+                line=dict(color="#FF7F0E"),
                 customdata=data["pressure"] * normalization_factors["pressure"],
                 hovertemplate=hovertemplate,
             )
@@ -227,7 +227,7 @@ def plot_hydro_traces(
                 x=data["radius"],
                 y=data["temperature"],
                 name="Temperature",
-                line=dict(color="#F3A431"),
+                line=dict(color="#2CA02C"),
                 customdata=data["temperature"] * normalization_factors["temperature"],
                 hovertemplate=hovertemplate,
             )
@@ -246,7 +246,7 @@ def plot_hydro_traces(
                 x=data["radius"],
                 y=data["mass"],
                 name="Mass",
-                line=dict(color="#6A6AF0"),
+                line=dict(color="#D62728"),
                 customdata=data["mass"] * normalization_factors["mass"],
                 hovertemplate=hovertemplate,
             )
@@ -265,7 +265,7 @@ def plot_hydro_traces(
                 x=data["radius"],
                 y=data["velocity"],
                 name="Velocity",
-                line=dict(color="#F06A6A"),
+                line=dict(color="#9467BD"),
                 customdata=data["velocity"] * normalization_factors["velocity"],
                 hovertemplate=hovertemplate,
             )
