@@ -182,6 +182,36 @@ class TestHydro1D(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             hydro.get_data()
 
+    def test_get_units_valid(self):
+        with NamedTemporaryFile(mode="w", delete=False) as f:
+            json.dump(self.valid_data, f)
+            path = f.name
+        hydro = Hydro1D(path)
+        os.unlink(path)
+        self.assertEqual(
+            hydro.get_units(),
+            self.valid_data["model"]["units"],
+        )
+
+    def test_get_units_invalid(self):
+        with NamedTemporaryFile(mode="w", delete=False) as f:
+            json.dump(self.invalid_data, f)
+            path = f.name
+        hydro = Hydro1D(path)
+        os.unlink(path)
+        with self.assertRaises(NotImplementedError):
+            hydro.get_units()
+
+    def test_plot_valid(self):
+        # TODO: Figure out how to test this
+        # Right now this just makes sure it doesn't crash
+        with NamedTemporaryFile(mode="w", delete=False) as f:
+            json.dump(self.valid_data, f)
+            path = f.name
+        hydro = Hydro1D(path)
+        os.unlink(path)
+        hydro.plot()
+
 
 if __name__ == "__main__":
     unittest.main()
