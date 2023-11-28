@@ -235,12 +235,16 @@ class Hydro1D:
 
         return units
 
-    def plot(self, show_plot=False) -> go.Figure:
+    def plot(self, model: str | int = None, show_plot: bool = False) -> go.Figure:
         """
         Plot the data
 
         Parameters
         ----------
+        model : str | int, optional
+            Model to plot, by default None. Accepts either the model name or
+            the index of the model in the list of models. If model is None,
+            the first model is plotted
         show_plot : bool, optional
             Show the plot, by default False
 
@@ -251,10 +255,19 @@ class Hydro1D:
         if not self.valid:
             raise NotImplementedError("Plotting of invalid data not implemented")
 
+        if model is None:
+            model = self.models[0]
+        elif isinstance(model, int):
+            assert model < len(self.models), "Invalid model index"
+            model = self.models[model]
+        elif isinstance(model, str):
+            assert model in self.models, "Invalid model name"
+        else:
+            raise TypeError("Invalid model type")
+
         fig = go.Figure()
 
         # TODO: Add support for multiple models
-        model = self.models[0]
         unique_times = self.get_unique_times(model=model)
         units = self.get_units(model=model)
 
@@ -265,8 +278,8 @@ class Hydro1D:
             num_data = plot_hydro_traces(fig, data, units, normalization_factors)
 
         # Make 0th trace visible
-        for i in range(num_data):
-            fig.data[i].visible = True
+        for j in range(num_data):
+            fig.data[j].visible = True
 
         if len(unique_times) > 1:
             fig = add_timestep_slider(
