@@ -134,7 +134,7 @@ class Hydro1D:
             raise TypeError("Invalid model type")
         return model
 
-    def get_unique_times(self, model: str | int) -> list:
+    def get_unique_times(self, model: str | int = None) -> list:
         """
         Get the unique time steps for a model.
         Returns an empty list if the data is invalid

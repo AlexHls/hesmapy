@@ -2,6 +2,7 @@ import unittest
 import os
 import json
 from tempfile import NamedTemporaryFile
+import pandas as pd
 from hesmapy.hydro.base import Hydro1D
 
 
@@ -98,6 +99,88 @@ class TestHydro1D(unittest.TestCase):
         hydro = Hydro1D(path)
         os.unlink(path)
         self.assertFalse(hydro.valid)
+
+    def test_get_model_empty(self):
+        with NamedTemporaryFile(mode="w", delete=False) as f:
+            json.dump([self.valid_data, self.valid_data], f)
+            path = f.name
+        hydro = Hydro1D(path)
+        os.unlink(path)
+        self.assertEqual(hydro._get_model(), list(self.valid_data.keys())[0])
+
+    def test_get_model_string(self):
+        with NamedTemporaryFile(mode="w", delete=False) as f:
+            json.dump([self.valid_data, self.valid_data], f)
+            path = f.name
+        hydro = Hydro1D(path)
+        os.unlink(path)
+        self.assertEqual(hydro._get_model("model"), list(self.valid_data.keys())[0])
+
+    def test_get_model_integer(self):
+        with NamedTemporaryFile(mode="w", delete=False) as f:
+            json.dump([self.valid_data, self.valid_data], f)
+            path = f.name
+        hydro = Hydro1D(path)
+        os.unlink(path)
+        self.assertEqual(hydro._get_model(0), list(self.valid_data.keys())[0])
+
+    def test_get_model_invalid(self):
+        with NamedTemporaryFile(mode="w", delete=False) as f:
+            json.dump([self.valid_data, self.valid_data], f)
+            path = f.name
+        hydro = Hydro1D(path)
+        os.unlink(path)
+        with self.assertRaises(TypeError):
+            hydro._get_model(1.2)
+
+    def test_get_unique_times_valid(self):
+        with NamedTemporaryFile(mode="w", delete=False) as f:
+            json.dump([self.valid_data, self.valid_data], f)
+            path = f.name
+        hydro = Hydro1D(path)
+        os.unlink(path)
+        self.assertEqual(hydro.get_unique_times(), [1, 2])
+
+    def test_get_unique_times_invalid(self):
+        with NamedTemporaryFile(mode="w", delete=False) as f:
+            json.dump([self.invalid_data, self.invalid_data], f)
+            path = f.name
+        hydro = Hydro1D(path)
+        os.unlink(path)
+        self.assertEqual(hydro.get_unique_times(), [])
+
+    def test_get_data_valid(self):
+        with NamedTemporaryFile(mode="w", delete=False) as f:
+            json.dump([self.valid_data, self.valid_data], f)
+            path = f.name
+        hydro = Hydro1D(path)
+        os.unlink(path)
+        pd.testing.assert_frame_equal(
+            hydro.get_data(),
+            pd.DataFrame(self.valid_data["model"]["data"]),
+        )
+
+    def test_get_data_valid_with_time(self):
+        with NamedTemporaryFile(mode="w", delete=False) as f:
+            json.dump([self.valid_data, self.valid_data], f)
+            path = f.name
+        hydro = Hydro1D(path)
+        os.unlink(path)
+        ref = pd.DataFrame(self.valid_data["model"]["data"])
+        ref = ref[ref["time"] == 1]
+        pd.testing.assert_frame_equal(
+            hydro.get_data(1),
+            ref,
+        )
+
+    def test_get_data_invalid(self):
+        with NamedTemporaryFile(mode="w", delete=False) as f:
+            json.dump([self.invalid_data, self.invalid_data], f)
+            path = f.name
+        hydro = Hydro1D(path)
+        os.unlink(path)
+        with self.assertRaises(NotImplementedError):
+            hydro.get_data()
 
 
 if __name__ == "__main__":
