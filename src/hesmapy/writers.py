@@ -23,7 +23,7 @@ def write_hydro1d_from_dataframe(
 ) -> None:
     """
     Write a 1D Hydrodynamical model to a JSON file
-    compatible with the HESMA scheme.
+    compatible with the HESMA scheme from a DataFrame.
 
     Parameters
     ----------
@@ -84,3 +84,69 @@ def write_hydro1d_from_dataframe(
         os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w") as f:
         json.dump(hydro, f)
+
+
+def write_hydro1d_from_dict(
+    data: dict | list[dict],
+    path: str,
+    model_names: str | list[str] = None,
+    sources: dict | list[dict] = None,
+    units: dict = None,
+    overwrite: bool = False,
+    create_path: bool = True,
+) -> None:
+    """
+    Write a 1D Hydrodynamical model to a JSON file
+    compatible with the HESMA scheme from a dict.
+
+    Parameters
+    ----------
+    data : dict | list[dict]
+        dict or list of dicts containing the
+        hydrodynamical data.
+    path : str
+        Path to the JSON file.
+    model_names : str | list[str], optional
+        Name(s) of the model(s) to write, by default None. If None,
+        the models will be named "model_0", "model_1", etc.
+    overwrite : bool, optional
+        Overwrite the file if it already exists, by default False.
+    create_path : bool, optional
+        Create the path if it does not exist, by default True.
+
+    Returns
+    -------
+    None
+
+    Notes
+    -----
+    The dict(s) must contain the following columns:
+    - time
+    - density
+    - radius
+    Other columns are optional. Only columns compliant with
+    the HESMA scheme will be written to the JSON file.
+
+    """
+
+    if isinstance(data, dict):
+        data = [data]
+    elif isinstance(data, list):
+        if not all(isinstance(df, dict) for df in data):
+            raise TypeError("data must be a dict or a list of dicts")
+    else:
+        raise TypeError("data must be a dict or a list of dicts")
+
+    data_dfs = []
+    for i, df in enumerate(data):
+        data_dfs.append(pd.DataFrame(df))
+
+    write_hydro1d_from_dataframe(
+        data_dfs,
+        path,
+        model_names=model_names,
+        sources=sources,
+        units=units,
+        overwrite=overwrite,
+        create_path=create_path,
+    )
