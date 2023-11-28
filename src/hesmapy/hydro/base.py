@@ -96,6 +96,7 @@ class Hydro1D:
                         modelname = f"{modelname}_{i}"
                     data[modelname] = item[self.models[i]]
                     self.models[i] = modelname
+                self.data = data
         else:
             # This collects all the edge cases I can't think of
             self.models = []

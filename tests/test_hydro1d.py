@@ -89,7 +89,7 @@ class TestHydro1D(unittest.TestCase):
             path = f.name
         hydro = Hydro1D(path)
         os.unlink(path)
-        self.assertFalse(hydro.valid)
+        self.assertTrue(hydro.valid)
 
 
 if __name__ == "__main__":
