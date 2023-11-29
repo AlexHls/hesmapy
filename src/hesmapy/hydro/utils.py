@@ -74,7 +74,6 @@ def get_abundance_data(data: pd.DataFrame, max_abundances: int) -> pd.DataFrame:
         masses = data["density"] * volumes
 
     total_mass = abundances.mul(masses, axis=0).sum().sort_values(ascending=False)
-    print(total_mass)
 
     # Get the top max_abundances elements
     abundances = abundances[total_mass.head(max_abundances).index]
