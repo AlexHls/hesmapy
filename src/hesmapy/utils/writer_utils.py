@@ -98,10 +98,13 @@ def _check_units(units: dict) -> dict:
     if units is not None:
         if not isinstance(units, dict):
             raise TypeError("units must be a dict")
-    else:
         for col in columns:
             if col not in units.keys():
                 units[col] = "(arb. units)"
+    else:
+        units = {}
+        for col in columns:
+            units[col] = "(arb. units)"
 
     return units
 
@@ -114,6 +117,7 @@ def _check_model_names(model_names: str | list[str], len_data: int) -> list[str]
             raise ValueError(
                 "model_names must be a list of strings with the same length as data"
             )
+        model_names = [model_names]
     elif isinstance(model_names, list):
         if not all(isinstance(name, str) for name in model_names):
             raise TypeError("model_names must be a list of strings")
@@ -121,6 +125,8 @@ def _check_model_names(model_names: str | list[str], len_data: int) -> list[str]
             raise ValueError(
                 "model_names must be a list of strings with the same length as data"
             )
+
+    return model_names
 
 
 def _check_numpy_array(array: np.ndarray | list[np.ndarray]) -> list[np.ndarray]:
