@@ -1,5 +1,6 @@
 # Purpose utilities for writing to files
 import pandas as pd
+import numpy as np
 
 from hesmapy.constants import HYDRO1D_SCHEMA, HYDRO1D_ABUNDANCE_REGEX
 
@@ -120,3 +121,15 @@ def _check_model_names(model_names: str | list[str], len_data: int) -> list[str]
             raise ValueError(
                 "model_names must be a list of strings with the same length as data"
             )
+
+
+def _check_numpy_array(array: np.ndarray | list[np.ndarray]) -> list[np.ndarray]:
+    if isinstance(array, np.ndarray):
+        array = [array]
+    elif isinstance(array, list):
+        if not all(isinstance(arr, np.ndarray) for arr in array):
+            raise TypeError("data must be a np.ndarray or a list of np.ndarray")
+    else:
+        raise TypeError("data must be a np.ndarray or a list of np.ndarray")
+
+    return array
