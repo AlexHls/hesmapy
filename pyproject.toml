@@ -21,7 +21,14 @@ dependencies = [
     "numpy>=1.26",
     "pandas>=2.1",
 ]
+
 dynamic = ["version"]
+
+[project.optional-dependencies]
+docs = [
+    "sphinx",
+    "shpinx-book-theme",
+]
 
 [project.urls]
 "Homepage" = "https://github.com/alexhls/hesmapy"
