@@ -1,8 +1,12 @@
 # Description: Constants used in the project
 import re
 
+from hesmapy.__about__ import __version__
+
 HYDRO1D_ABUNDANCE_REGEX = re.compile(r"\bx[a-zA-Z]{1,2}[0-9]{0,3}\b")
-HYDRO1D_SCHEMA = "https://github.com/AlexHls/hesmapy/blob/v0.1.0/SCHEMA.md"
+HYDRO1D_SCHEMA = "https://github.com/AlexHls/hesmapy/blob/v{:s}/SCHEMA.md".format(
+    __version__
+)
 HYDRO1D_JSON_SCHEMA = {
     "type": "object",
     "properties": {
