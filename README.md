@@ -22,8 +22,8 @@ might be rather limited in their functionality.
 ### Hydro
 
 #### Hydro1D
-This module contains the tools for one-dimensional hydro models.
-**Usage:**
+This module contains the tools for one-dimensional hydro models.  
+**Usage:**  
 Loading models:
 ```python
 import hesmapy.base as hp
