@@ -83,7 +83,11 @@ def write_hydro1d_from_dataframe(
         data_dict = _hydro1d_dataframe_to_json_dict(df, model_names[i], sources, units)
         hydro[model_names[i]] = data_dict[model_names[i]]
 
-    if create_path:
+    if (
+        create_path
+        and not os.path.exists(os.path.dirname(path))
+        and os.path.dirname(path) != ""
+    ):
         os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w") as f:
         json.dump(hydro, f)
