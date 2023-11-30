@@ -22,20 +22,6 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 
-inputs:
-  name:
-    description: 'Artifact name'
-    required: false
-    default: 'github-pages'
-  path:
-    description: "Path of the directory containing the static assets."
-    required: true
-    default: "docs/build/html/"
-  retention-days:
-    description: "Duration after which artifact will expire in days."
-    required: false
-    default: "1"
-
 jobs:
   build-docs:
     runs-on: ubuntu-latest
@@ -72,7 +58,6 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-      INPUT_PATH: ${{ inputs.path }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -80,14 +65,14 @@ jobs:
         uses: actions/configure-pages@v3
       - name: Fix permissions
         run: |
-          chmod -c -R +rX "$INPUT_PATH" | while read line; do
+          chmod -c -R +rX "docs/build/html/" | while read line; do
             echo "::warning title=Invalid file permissions automatically fixed::$line"
           done
       - name: Archive artifact
         run: |
           tar \
             --dereference --hard-dereference \
-            --directory "$INPUT_PATH" \
+            --directory "docs/build/html/" \
             -cvf "$RUNNER_TEMP/github-pages.tar" \
             .
       - name: Upload artifact
