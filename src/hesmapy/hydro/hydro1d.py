@@ -256,6 +256,11 @@ class Hydro1D:
         for j in range(num_data):
             fig.data[j].visible = True
 
+        # Add a title for the 0th trace
+        if unique_times is not None:
+            title = "Time: " + "{:.4f}".format(unique_times[0]) + " " + units["time"]
+            fig.update_layout(title=title)
+
         if len(unique_times) > 1:
             fig = add_timestep_slider(
                 fig, time=unique_times, time_unit=units["time"], num_data=num_data

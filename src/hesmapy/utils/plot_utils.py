@@ -42,7 +42,7 @@ def add_timestep_slider(
     steps = []
     for i in range(len(time)):
         if time is not None:
-            title = "Time: " + str(time[i]) + " " + time_unit
+            title = "Time: " + "{:.4f}".format(time[i]) + " " + time_unit
         else:
             title = "Updated to timestep: " + str(i)
         step = dict(
@@ -53,7 +53,9 @@ def add_timestep_slider(
             ],  # layout attribute
         )
         for j in range(num_data):
-            step["args"][0]["visible"][i + j] = True  # Toggle i'th trace to "visible"
+            step["args"][0]["visible"][
+                i * num_data + j
+            ] = True  # Toggle i'th trace to "visible"
         steps.append(step)
 
     sliders = [
