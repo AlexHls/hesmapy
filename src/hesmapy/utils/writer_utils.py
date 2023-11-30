@@ -125,6 +125,8 @@ def _check_model_names(model_names: str | list[str], len_data: int) -> list[str]
             raise ValueError(
                 "model_names must be a list of strings with the same length as data"
             )
+        if len(set(model_names)) != len(model_names):
+            raise ValueError("model_names must be unique")
 
     return model_names
 

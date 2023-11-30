@@ -3,7 +3,7 @@ import json
 import pandas as pd
 import numpy as np
 
-from hemsmapy.utils.writer_utils import (
+from hesmapy.utils.writer_utils import (
     _check_sources,
     _check_units,
     _check_model_names,
@@ -164,12 +164,12 @@ def write_hydro1d_from_numpy(
     temperature: np.ndarray | list[np.ndarray] = None,
     mass: np.ndarray | list[np.ndarray] = None,
     velocity: np.ndarray | list[np.ndarray] = None,
-    abundances: dict | list[dict] = None,
     model_names: str | list[str] = None,
     sources: dict | list[dict] = None,
     units: dict = None,
     overwrite: bool = False,
     create_path: bool = True,
+    **kwargs,
 ) -> None:
     """
     Write a 1D Hydrodynamical model to a JSON file
@@ -195,9 +195,6 @@ def write_hydro1d_from_numpy(
         Mass of the model cells, by default None.
     velocity : np.ndarray | list[np.ndarray], optional
         Velocity of the model cells, by default None.
-    abundances : dict | list[dict], optional
-        Abundances of the model cells, by default None. Each
-        element of the dict must be a np.ndarray with the same length as the other quantities.
     model_names : str | list[str], optional
         Name(s) of the model(s) to write, by default None. If None,
         the models will be named "model_0", "model_1", etc.
@@ -212,8 +209,8 @@ def write_hydro1d_from_numpy(
 
     Notes
     -----
-    Only abundances whose name is compliant with the HESMA scheme
-    will be taken from the dict.
+    Abundances can be added as keyword arguments. The keyword must
+    match the following regular expression: r'\bx[a-zA-Z]{1,2}[0-9]{0,3}\b'.
 
     """
 
@@ -227,6 +224,11 @@ def write_hydro1d_from_numpy(
         mass = _check_numpy_array(mass)
     if velocity is not None:
         velocity = _check_numpy_array(velocity)
+
+    abundances = {}
+    for arg in kwargs.keys():
+        if HYDRO1D_ABUNDANCE_REGEX.match(arg):
+            abundances[arg] = _check_numpy_array(kwargs[arg])
 
     if len(radius) != len(density):
         raise ValueError("radius and density must have the same length")
@@ -242,6 +244,10 @@ def write_hydro1d_from_numpy(
     if velocity is not None:
         if len(radius) != len(velocity):
             raise ValueError("radius and velocity must have the same length")
+    if len(abundances) != 0:
+        for key in abundances.keys():
+            if len(radius) != len(abundances[key]):
+                raise ValueError(f"radius and {key} must have the same length")
 
     if isinstance(time, float):
         time = [time] * len(radius)
@@ -251,30 +257,6 @@ def write_hydro1d_from_numpy(
                 "time must be a float or an array with the same length as"
                 " the number of models"
             )
-
-    if abundances is not None:
-        if isinstance(abundances, dict):
-            abundances = [abundances]
-        elif isinstance(abundances, list):
-            if not all(isinstance(abund, dict) for abund in abundances):
-                raise TypeError("abundances must be a dict or a list of dicts")
-        else:
-            raise TypeError("abundances must be a dict or a list of dicts")
-
-        for abund in abundances:
-            if not all(isinstance(key, str) for key in abund.keys()):
-                raise TypeError("abundances keys must be strings")
-
-        for key in abundances[0].keys():
-            if len(abundances[0][key]) != len(radius):
-                raise ValueError(
-                    f"abundances[{key}] must have the same length as the number of models"
-                )
-
-        for abund in abundances:
-            for key in abund.keys():
-                if not isinstance(abund[key], np.ndarray):
-                    raise TypeError(f"abundances[{key}] must be a np.ndarray")
 
     data_dfs = []
     for i, df in enumerate(radius):
@@ -292,13 +274,8 @@ def write_hydro1d_from_numpy(
         if velocity is not None:
             data["velocity"] = velocity[i]
         if abundances is not None:
-            keys = [
-                key
-                for key in abundances[i].keys()
-                if HYDRO1D_ABUNDANCE_REGEX.match(key)
-            ]
-            for key in keys:
-                data[key] = abundances[i][key]
+            for key in abundances.keys():
+                data[key] = abundances[key][i]
 
         df = pd.DataFrame(data)
         data_dfs.append(pd.DataFrame(df))

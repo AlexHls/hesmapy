@@ -37,9 +37,10 @@ class TestWriterUtilsCheckNumpyArray(unittest.TestCase):
 class TestWriterUtilsCheckModelNames(unittest.TestCase):
     def setUp(self):
         self.valid_model_names = "test"
-        self.valid_model_names_list = ["test", "test"]
+        self.valid_model_names_list = ["test1", "test2"]
         self.invalid_model_names = "test"
-        self.invalid_model_names_list = ["test", "test"]
+        self.invalid_model_names_list = ["test1", "test2"]
+        self.dup_model_names_list = ["test1", "test1"]
 
     def test_check_model_names_empty(self):
         self.assertEqual(_check_model_names(None, 2), ["model_0", "model_1"])
@@ -62,6 +63,10 @@ class TestWriterUtilsCheckModelNames(unittest.TestCase):
     def test_check_model_names_invalid_model_names_list(self):
         with self.assertRaises(ValueError):
             _check_model_names(self.invalid_model_names_list, 3)
+
+    def test_check_model_names_dup_model_names_list(self):
+        with self.assertRaises(ValueError):
+            _check_model_names(self.dup_model_names_list, 2)
 
 
 class TestWriterUtilsCheckUnits(unittest.TestCase):
