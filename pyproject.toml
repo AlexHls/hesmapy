@@ -17,6 +17,9 @@ classifiers = [
 ]
 dependencies = [
     "jsonschema",
+    "plotly>=5.18",
+    "numpy>=1.26",
+    "pandas>=2.1",
 ]
 dynamic = ["version"]
 
