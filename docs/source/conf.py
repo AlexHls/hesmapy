@@ -17,6 +17,7 @@ release = "v23.12.1"
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
+    "sphinx_copybutton",
 ]
 
 templates_path = ["_templates"]
@@ -26,6 +27,6 @@ exclude_patterns = []
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = "sphinx_book_theme"
+html_theme = "furo"
 html_static_path = ["_static"]
 html_favicon = "_static/favicon.ico"

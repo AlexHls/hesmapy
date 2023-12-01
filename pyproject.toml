@@ -27,7 +27,8 @@ dynamic = ["version"]
 [project.optional-dependencies]
 docs = [
     "sphinx",
-    "shpinx-book-theme",
+    "furo",
+    "sphinx-copybutton",
 ]
 
 [project.urls]
