@@ -28,6 +28,7 @@ dynamic = ["version"]
 docs = [
     "sphinx",
     "shpinx-book-theme",
+    "sphinx-copybutton",
 ]
 
 [project.urls]
