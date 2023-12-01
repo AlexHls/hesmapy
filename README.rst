@@ -1,7 +1,7 @@
 =======
 Hesmapy
 =======
-# hesmapy
+
 .. image:: https://pypip.in/v/hesmapy/badge.png
     :target: https://pypi.org/project/hesmapy/
     :alt: Latest PyPI version
