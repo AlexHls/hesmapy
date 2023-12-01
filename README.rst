@@ -2,13 +2,9 @@
 Hesmapy
 =======
 
-.. image:: https://pypip.in/v/hesmapy/badge.png
-    :target: https://pypi.org/project/hesmapy/
+.. image:: https://badge.fury.io/py/hesmapy.svg
+    :target: https://badge.fury.io/py/hesmapy
     :alt: Latest PyPI version
-
-.. image:: https://pypip.in/d/hemsapy/badge.png
-    :target: https://pypi.org/project/hesmapy/
-    :alt: Number of PyPI downloads
 
 HESMA Python - Tools for reading HESMA models
 
