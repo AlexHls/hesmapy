@@ -32,4 +32,4 @@ If you want to build the documentation, you also need to install the documentati
 
 .. code-block:: bash
 
-   pip install sphinx sphinx-book-theme sphinx-copybutton
+   pip install sphinx furo sphinx-copybutton
