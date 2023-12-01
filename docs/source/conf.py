@@ -17,6 +17,7 @@ release = "v23.12.1"
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
+    "sphinx_copybutton",
 ]
 
 templates_path = ["_templates"]
