@@ -1,4 +1,7 @@
 # hesmapy
+[![PyPi version](https://pypip.in/v/hesmapy/badge.png)](https://crate.io/packages/hesmapy/)
+[![PyPi downloads](https://pypip.in/d/hesmapy/badge.png)](https://crate.io/packages/hesmapy/)
+
 HESMA Python - Tools for reading HESMA models
 
 ## Documentation
