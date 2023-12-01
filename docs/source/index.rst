@@ -20,7 +20,15 @@ Contents
 
     installation
     getting_started
-    modules/modules
+
+
+API Reference
+-------------
+
+.. toctree::
+   :maxdepth: 2
+
+   modules/modules
 
 
 
