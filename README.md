@@ -1,4 +1,8 @@
-# hesmapy
+# Hesmapy
+
+![PyPI - Version](https://img.shields.io/pypi/v/hesmapy)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/hesmapy)
+
 HESMA Python - Tools for reading HESMA models
 
 ## Documentation
@@ -45,3 +49,4 @@ See the documentation for more details.
 
 ### Tracer
 *(Not yet implemented)*
+
