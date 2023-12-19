@@ -2,6 +2,7 @@
 
 ![PyPI - Version](https://img.shields.io/pypi/v/hesmapy)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/hesmapy)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10404977.svg)](https://doi.org/10.5281/zenodo.10404977)
 
 HESMA Python - Tools for reading HESMA models
 
