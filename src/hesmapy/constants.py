@@ -3,6 +3,26 @@ import re
 
 from hesmapy.__about__ import __version__
 
+HESMA_BASE_JSON_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "name": {"type": "string"},
+        "schema": {"type": "string"},
+        "sources": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "bibcode": {"type": "string"},
+                    "reference": {"type": "string"},
+                    "url": {"type": "string"},
+                },
+            },
+        },
+    },
+    "required": ["name"],
+}
+
 HYDRO1D_ABUNDANCE_REGEX = re.compile(r"\bx[a-zA-Z]{1,2}[0-9]{0,3}\b")
 HYDRO1D_SCHEMA = "https://github.com/AlexHls/hesmapy/blob/v{:s}/SCHEMA.md".format(
     __version__
