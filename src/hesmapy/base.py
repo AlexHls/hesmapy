@@ -1,5 +1,5 @@
 from hesmapy.hydro.hydro1d import Hydro1D
-from hesmapy.lightcurves.rt_lightcurve import RTLightcurve
+from hesmapy.rt.lightcurves import RTLightcurve
 
 
 def load_hydro_1d(path):
