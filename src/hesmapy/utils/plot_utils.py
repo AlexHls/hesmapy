@@ -1,6 +1,6 @@
-# Purpose: Utility functions for plotting
-import plotly.graph_objects as go
+import numpy as np
 import pandas as pd
+import plotly.graph_objects as go
 
 
 ABUNDANCE_COLORS = [
@@ -10,6 +10,18 @@ ABUNDANCE_COLORS = [
     "#BCBD22",
     "#17BECF",
 ]  # Colors for abundance traces
+
+# DONT TOUCH THE ORDER OF THESE COLUMNS!
+DERIVED_LIGHTCURVE_COLUMNS = [
+    ("band", "Band"),
+    ("decline_rate_15", r"$\Delta m_{15}$"),
+    ("peak_mag", r"$m_\text{max}$"),
+    ("peak_time", r"$t_\text{max}$"),
+    ("rise_time", r"$t_\text{rise}$"),
+    ("decline_rate_40", r"$\Delta m_{40}$"),
+]  # DO NOT CHANGE THE ORDER OF THESE COLUMNS!
+# For some reason the column labels disappear if you change the order of the columns
+# and you use the viewing angle slider. I have no idea why this happens
 
 
 def add_timestep_slider(
@@ -53,15 +65,78 @@ def add_timestep_slider(
             ],  # layout attribute
         )
         for j in range(num_data):
-            step["args"][0]["visible"][
-                i * num_data + j
-            ] = True  # Toggle i'th trace to "visible"
+            step["args"][0]["visible"][i * num_data + j] = (
+                True  # Toggle i'th trace to "visible"
+            )
         steps.append(step)
 
     sliders = [
         dict(
             active=0,
             currentvalue={"prefix": "Timestep: "},
+            pad={"t": 50},
+            steps=steps,
+        )
+    ]
+
+    fig.update_layout(sliders=sliders)
+
+    return fig
+
+
+def add_viewing_angle_slider(
+    fig: go.Figure,
+    viewing_angles: list | None = None,
+    num_data: list = [1],
+) -> go.Figure:
+    """
+    Add a slider to the figure
+
+    Parameters
+    ----------
+    fig : go.Figure
+        Figure to add slider to
+    viewing_angles : list, optional
+        List of viewing angles to use for slider, by default None
+    num_data : list, optional
+
+    Returns
+    -------
+    go.Figure
+    """
+
+    assert len(num_data) == len(
+        viewing_angles
+    ), "num_data must have the same length as viewing_angles"
+
+    total_data = np.sum(num_data)
+
+    steps = []
+    for i in range(len(viewing_angles)):
+        if viewing_angles is not None:
+            title = "Viewing angle bin: " + f"{viewing_angles[i]}"
+        else:
+            title = "Viewing angle bin: " + str(i)
+        step = dict(
+            method="update",
+            args=[
+                {"visible": [False] * len(fig.data)},
+                {"title": title},
+            ],  # layout attribute
+        )
+        for j in range(num_data[i]):
+            step["args"][0]["visible"][i * num_data[i] + j] = (
+                True  # Toggle i'th trace to "visible"
+            )
+        step["args"][0]["visible"][total_data + i] = (
+            True  # Toggle i'th table to "visible"
+        )
+        steps.append(step)
+
+    sliders = [
+        dict(
+            active=0,
+            currentvalue={"prefix": "Viewing angle bin: "},
             pad={"t": 50},
             steps=steps,
         )
@@ -156,6 +231,59 @@ def add_log_axis_buttons(fig: go.Figure, axis: str = "both") -> go.Figure:
     fig.update_layout(updatemenus=updatemenus)
     fig.update_layout(annotations=annotations)
 
+    return fig
+
+
+def add_reverse_y_axis_button(fig: go.Figure) -> go.Figure:
+    """
+    Add buttons to reverse the y axis
+
+    Parameters
+    ----------
+    fig : go.Figure
+        Figure to add buttons to
+
+    Returns
+    -------
+    go.Figure
+    """
+    # Define the layout button
+    button = dict(
+        label="Inverted Y-Axis",
+        method="relayout",
+        args=[
+            {
+                "yaxis.autorange": not True
+                if fig.layout.yaxis.autorange == "reversed"
+                else "reversed"
+            }
+        ],
+    )
+    button2 = dict(
+        label="Regular Y-Axis",
+        method="relayout",
+        args=[
+            {
+                "yaxis.autorange": not True
+                if fig.layout.yaxis.autorange == "reversed"
+                else "max"  # I have no idea why 'max' works and True doesn't. DON'T TOUCH THIS
+            }
+        ],
+    )
+
+    # Add the button to the updatemenus attribute
+    fig.update_layout(
+        updatemenus=[
+            dict(
+                type="buttons",
+                buttons=[button, button2],
+                pad={"r": 2, "t": 10},
+                showactive=True,
+                xanchor="right",
+                yanchor="top",
+            )
+        ]
+    )
     return fig
 
 
@@ -329,3 +457,88 @@ def plot_abundance_traces(
         )
 
     return num_data
+
+
+def plot_lightcurves(
+    fig: go.Figure, data: pd.DataFrame, units: dict, bands: list
+) -> int:
+    """
+    Plot hydro data
+
+    Parameters
+    ----------
+    fig : go.Figure
+        Figure to add traces to
+    data : pd.DataFrame
+        Data to plot
+    units : dict
+        Units of data
+    bands : list
+        Bands to plot
+
+
+    Returns
+    -------
+    int
+    """
+    num_data = 0
+    for band in bands:
+        subset = data[data["band"] == band]
+        hovertemplate = (
+            f"{band}"
+            + ": %{y:.2e}"
+            + f" {units[band]}<br>Time: "
+            + "%{x:.2e}"
+            + f" {units['time']}<br>"
+        )
+        fig.add_trace(
+            go.Scatter(
+                visible=False,
+                x=subset["time"],
+                y=subset["magnitude"],
+                name=band,
+                hovertemplate=hovertemplate,
+            ),
+            row=1,
+            col=1,
+        )
+        num_data += 1
+
+    return num_data
+
+
+def plot_derived_lightcurve_data(fig: go.Figure, data: pd.DataFrame) -> None:
+    """
+    Plot derived lightcurve data
+
+    Parameters
+    ----------
+    fig : go.Figure
+        Figure to add traces to
+    data : pd.DataFrame
+        Data to plot
+
+    Returns
+    -------
+    None
+    """
+    values_header = []
+    values_cells = []
+    for col, label in DERIVED_LIGHTCURVE_COLUMNS:
+        values_header.append(label)
+        try:
+            values_cells.append(data[col])
+        except KeyError:
+            values_cells.append(["-"] * len(data))
+
+    fig.add_trace(
+        go.Table(
+            header=dict(values=values_header),
+            cells=dict(
+                values=values_cells,
+            ),
+            visible=False,
+        ),
+        row=2,
+        col=1,
+    )

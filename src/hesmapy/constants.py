@@ -111,7 +111,7 @@ RT_LIGHTCURVE_JSON_SCHEMA = {
                     "band": {"type": "string"},
                     "viewing_angle": {"type": "number"},
                 },
-                "required": ["magnitude", "time"],
+                "required": ["magnitude", "time", "viewing_angle", "band"],
             },
         },
         "derived_data": {
