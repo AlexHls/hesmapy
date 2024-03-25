@@ -71,7 +71,10 @@ class RTLightcurve(HesmaBaseJSONFile):
             raise NotImplementedError("Getting data of invalid data not implemented")
 
         model = self._get_model(model=model)
-        df = pd.DataFrame(self.data[model]["derived_data"])
+        try:
+            df = pd.DataFrame(self.data[model]["derived_data"])
+        except KeyError:
+            return pd.DataFrame()
 
         if viewing_angle is None:
             return df
@@ -182,18 +185,23 @@ class RTLightcurve(HesmaBaseJSONFile):
 
         model = self._get_model(model=model)
 
-        fig = make_subplots(
-            rows=2,
-            cols=1,
-            vertical_spacing=0.12,
-            subplot_titles=("Lightcurves", "Derived Data"),
-            specs=[[{"type": "scatter"}], [{"type": "table"}]],
-        )
-
         # TODO: Add support for multiple models
         unique_viewing_angles = self.get_unique_viewing_angles(model=model)
         unique_bands = self.get_unique_bands(model=model)
         units = self.get_units(model=model)
+        has_derived_data = not self.get_derived_data(model=model).empty
+
+        fig = make_subplots(
+            rows=2 if has_derived_data else 1,
+            cols=1,
+            vertical_spacing=0.12,
+            subplot_titles=("Lightcurves", "Derived Data")
+            if has_derived_data
+            else ("Lightcurves",),
+            specs=[[{"type": "scatter"}], [{"type": "table"}]]
+            if has_derived_data
+            else [[{"type": "scatter"}]],
+        )
 
         # Split data into unique time steps
         num_data = []
@@ -202,21 +210,24 @@ class RTLightcurve(HesmaBaseJSONFile):
             num_data.append(plot_lightcurves(fig, data, units, unique_bands))
 
         # Plot derived data
-        for va in unique_viewing_angles:
-            derived_data = self.get_derived_data(viewing_angle=va, model=model)
-            plot_derived_lightcurve_data(fig, derived_data)
+        if has_derived_data:
+            for va in unique_viewing_angles:
+                derived_data = self.get_derived_data(viewing_angle=va, model=model)
+                plot_derived_lightcurve_data(fig, derived_data)
 
         # Make 0th trace visible
         for j in range(num_data[0]):
             fig.data[j].visible = True
         # Make 0th table visible
-        fig.data[np.sum(num_data)].visible = True
+        if has_derived_data:
+            fig.data[np.sum(num_data)].visible = True
 
         if len(unique_viewing_angles) > 1:
             fig = add_viewing_angle_slider(
                 fig,
                 viewing_angles=unique_viewing_angles,
                 num_data=num_data,
+                has_derived_data=has_derived_data,
             )
 
         # Add a title for the 0th trace

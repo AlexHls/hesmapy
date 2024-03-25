@@ -88,6 +88,7 @@ def add_viewing_angle_slider(
     fig: go.Figure,
     viewing_angles: list | None = None,
     num_data: list = [1],
+    has_derived_data: bool = False,
 ) -> go.Figure:
     """
     Add a slider to the figure
@@ -99,6 +100,9 @@ def add_viewing_angle_slider(
     viewing_angles : list, optional
         List of viewing angles to use for slider, by default None
     num_data : list, optional
+        Number of data sets for each viewing angle, by default [1]
+    has_derived_data : bool, optional
+        Whether or not the figure has derived data, by default False
 
     Returns
     -------
@@ -128,9 +132,10 @@ def add_viewing_angle_slider(
             step["args"][0]["visible"][i * num_data[i] + j] = (
                 True  # Toggle i'th trace to "visible"
             )
-        step["args"][0]["visible"][total_data + i] = (
-            True  # Toggle i'th table to "visible"
-        )
+        if has_derived_data:
+            step["args"][0]["visible"][total_data + i] = (
+                True  # Toggle i'th table to "visible"
+            )
         steps.append(step)
 
     sliders = [
