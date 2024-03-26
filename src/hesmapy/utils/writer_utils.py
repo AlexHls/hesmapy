@@ -1,4 +1,3 @@
-# Purpose utilities for writing to files
 import pandas as pd
 import numpy as np
 
