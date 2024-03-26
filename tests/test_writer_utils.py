@@ -5,7 +5,7 @@ import pandas as pd
 from hesmapy.utils.writer_utils import (
     _check_numpy_array,
     _check_model_names,
-    _check_units,
+    _check_hydro1d_units,
     _check_sources,
     _hydro1d_dataframe_to_json_dict,
 )
@@ -100,18 +100,19 @@ class TestWriterUtilsCheckUnits(unittest.TestCase):
         }
 
     def test_check_units_valid_units(self):
-        self.assertEqual(_check_units(self.valid_units), self.valid_units)
+        self.assertEqual(_check_hydro1d_units(self.valid_units), self.valid_units)
 
     def test_check_units_empty(self):
-        self.assertEqual(_check_units(None), self.empty_units)
+        self.assertEqual(_check_hydro1d_units(None), self.empty_units)
 
     def test_check_units_invalid_units(self):
         with self.assertRaises(TypeError):
-            _check_units("invalid_units")
+            _check_hydro1d_units("invalid_units")
 
-    def test_ckeck_units_incomplete_units(self):
+    def test_check_units_incomplete_units(self):
         self.assertEqual(
-            _check_units({"radius": "cm", "density": "g/cm^3"}), self.partial_units
+            _check_hydro1d_units({"radius": "cm", "density": "g/cm^3"}),
+            self.partial_units,
         )
 
 
