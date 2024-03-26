@@ -181,3 +181,172 @@ def write_rt_lightcurve_from_dict(
         overwrite=overwrite,
         create_path=create_path,
     )
+
+
+def write_rt_lightcurve_from_numpy(
+    time: np.ndarray | list[np.ndarray],
+    magnitude: np.ndarray | list[np.ndarray],
+    band: str | list[str],
+    viewing_angle: np.ndarray | list[np.ndarray],
+    path: str,
+    e_magnitude: np.ndarray | list[np.ndarray] = None,
+    peak_mag: np.ndarray | list[np.ndarray] = None,
+    peak_time: np.ndarray | list[np.ndarray] = None,
+    rise_time: np.ndarray | list[np.ndarray] = None,
+    decline_rate_15: np.ndarray | list[np.ndarray] = None,
+    decline_rate_40: np.ndarray | list[np.ndarray] = None,
+    derived_band: str | list[str] = None,
+    derived_viewing_angle: np.ndarray | list[np.ndarray] = None,
+    model_names: str | list[str] = None,
+    sources: dict | list[dict] = None,
+    units: dict = None,
+    overwrite: bool = False,
+    create_path: bool = True,
+) -> None:
+    """
+    Write lightcurve data to a JSON file
+    compatible with the HESMA scheme from numpy arrays.
+
+    Parameters
+    ----------
+    time : np.ndarray | list[np.ndarray]
+        Time of the lightcurve data.
+    magnitude : np.ndarray | list[np.ndarray]
+        Magnitude of the lightcurve data.
+    band : str | list[str]
+        Bands of the lightcurve data.
+    viewing_angle : np.ndarray | list[np.ndarray]
+        Viewing angles of the lightcurve data.
+    path : str
+        Path to the JSON file.
+    e_magnitude : np.ndarray | list[np.ndarray], optional
+        Error on the magnitude of the lightcurve data, by default None.
+    peak_mag : np.ndarray | list[np.ndarray], optional
+        Peak magnitude of the lightcurve data, by default None.
+    peak_time : np.ndarray | list[np.ndarray], optional
+        Peak time of the lightcurve data, by default None.
+    rise_time : np.ndarray | list[np.ndarray], optional
+        Rise time of the lightcurve data, by default None.
+    decline_rate_15 : np.ndarray | list[np.ndarray], optional
+        Decline rate at 15 days of the lightcurve data, by default None.
+    decline_rate_40 : np.ndarray | list[np.ndarray], optional
+        Decline rate at 40 days of the lightcurve data, by default None.
+    derived_band : str | list[str], optional
+        Bands of the derived data, by default None.
+    derived_viewing_angle : np.ndarray | list[np.ndarray], optional
+        Viewing angles of the derived data, by default None.
+    model_names : str | list[str], optional
+        Name(s) of the model(s) to write, by default None. If None,
+        the models will be named "model_0", "model_1", etc.
+    sources : dict | list[dict], optional
+        Source(s) of the model, by default None.
+    units : dict, optional
+        Units of the model, by default None. If None, the units will
+        be set to "(arb. units)".
+    overwrite : bool, optional
+        Overwrite the file if it already exists, by default False.
+    create_path : bool, optional
+        Create the path if it does not exist, by default True.
+
+    Returns
+    -------
+    None
+
+    Notes
+    -----
+    The numpy arrays of the data and derived data must have the same
+    length, respectively. Multiple lightcurves of the same model should
+    be given in the same one-dimensional numpy array. The time, magnitude
+    and band arrays in combination will be used to extract the
+    individual lightcurves.
+
+    """
+
+    time = _check_numpy_array(time)
+    magnitude = _check_numpy_array(magnitude)
+    band = _check_numpy_array(band)
+    viewing_angle = _check_numpy_array(viewing_angle)
+    if e_magnitude is not None:
+        e_magnitude = _check_numpy_array(e_magnitude)
+    if peak_mag is not None:
+        peak_mag = _check_numpy_array(peak_mag)
+    if peak_time is not None:
+        peak_time = _check_numpy_array(peak_time)
+    if rise_time is not None:
+        rise_time = _check_numpy_array(rise_time)
+    if decline_rate_15 is not None:
+        decline_rate_15 = _check_numpy_array(decline_rate_15)
+    if decline_rate_40 is not None:
+        decline_rate_40 = _check_numpy_array(decline_rate_40)
+    if derived_band is not None:
+        derived_band = _check_numpy_array(derived_band)
+    if derived_viewing_angle is not None:
+        derived_viewing_angle = _check_numpy_array(derived_viewing_angle)
+
+    if len(time) != len(magnitude) != len(band) != len(viewing_angle):
+        raise ValueError("All data arrays must have the same length")
+    if e_magnitude is not None:
+        if len(e_magnitude) != len(time):
+            raise ValueError("All arrays must have the same length")
+
+    derived_lengths = []
+    if peak_mag is not None:
+        derived_lengths.append(len(peak_mag))
+    if peak_time is not None:
+        derived_lengths.append(len(peak_time))
+    if rise_time is not None:
+        derived_lengths.append(len(rise_time))
+    if decline_rate_15 is not None:
+        derived_lengths.append(len(decline_rate_15))
+    if decline_rate_40 is not None:
+        derived_lengths.append(len(decline_rate_40))
+    if derived_band is not None:
+        derived_lengths.append(len(derived_band))
+    if derived_viewing_angle is not None:
+        derived_lengths.append(len(derived_viewing_angle))
+
+    if len(set(derived_lengths)) > 1:  # 0 if empty, 1 if all the same
+        raise ValueError("All derived data arrays must have the same length")
+
+    data_dfs = []
+    for i, t in enumerate(time):
+        data = {
+            "time": t,
+            "magnitude": magnitude[i],
+            "band": band[i],
+            "viewing_angle": viewing_angle[i],
+        }
+        if e_magnitude is not None:
+            data["e_magnitude"] = e_magnitude[i]
+        data_dfs.append(pd.DataFrame(data))
+
+    derived_data_dfs = []
+    if len(set(derived_lengths)) == 1:
+        for i in range(derived_lengths[0]):
+            data = {}
+            if peak_mag is not None:
+                data["peak_mag"] = peak_mag[i]
+            if peak_time is not None:
+                data["peak_time"] = peak_time[i]
+            if rise_time is not None:
+                data["rise_time"] = rise_time[i]
+            if decline_rate_15 is not None:
+                data["decline_rate_15"] = decline_rate_15[i]
+            if decline_rate_40 is not None:
+                data["decline_rate_40"] = decline_rate_40[i]
+            if derived_band is not None:
+                data["band"] = derived_band[i]
+            if derived_viewing_angle is not None:
+                data["viewing_angle"] = derived_viewing_angle[i]
+            derived_data_dfs.append(pd.DataFrame(data))
+
+    write_rt_lightcurve_from_dataframe(
+        data_dfs,
+        path,
+        derived_data=derived_data_dfs if derived_data_dfs != [] else None,
+        model_names=model_names,
+        sources=sources,
+        units=units,
+        overwrite=overwrite,
+        create_path=create_path,
+    )

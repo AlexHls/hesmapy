@@ -163,7 +163,7 @@ def write_hydro1d_from_numpy(
 ) -> None:
     """
     Write a 1D Hydrodynamical model to a JSON file
-    compatible with the HESMA scheme from a dict.
+    compatible with the HESMA scheme from numpy arrays.
 
     Parameters
     ----------
@@ -249,9 +249,9 @@ def write_hydro1d_from_numpy(
             )
 
     data_dfs = []
-    for i, df in enumerate(radius):
+    for i, r in enumerate(radius):
         data = {
-            "radius": radius[i],
+            "radius": r,
             "density": density[i],
             "time": time[i],
         }
@@ -267,8 +267,7 @@ def write_hydro1d_from_numpy(
             for key in abundances.keys():
                 data[key] = abundances[key][i]
 
-        df = pd.DataFrame(data)
-        data_dfs.append(pd.DataFrame(df))
+        data_dfs.append(pd.DataFrame(data))
 
     write_hydro1d_from_dataframe(
         data_dfs,
