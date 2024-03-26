@@ -249,7 +249,7 @@ def _check_numpy_array(array: np.ndarray | list[np.ndarray]) -> list[np.ndarray]
     return array
 
 
-def _check_data(
+def _check_data_dataframe(
     data: pd.DataFrame | list[pd.DataFrame], columns: list[str]
 ) -> list[pd.DataFrame]:
     if isinstance(data, pd.DataFrame):
@@ -263,6 +263,18 @@ def _check_data(
     for i, df in enumerate(data):
         if not all(col in df.columns for col in columns):
             raise ValueError(f"DataFrame {i} must contain the columns: {columns}")
+
+    return data
+
+
+def _check_data_dict(data: dict | list[dict]) -> list[dict]:
+    if isinstance(data, dict):
+        data = [data]
+    elif isinstance(data, list):
+        if not all(isinstance(d, dict) for d in data):
+            raise TypeError("data must be a dict or a list of dicts")
+    else:
+        raise TypeError("data must be a dict or a list of dicts")
 
     return data
 

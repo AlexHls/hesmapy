@@ -4,7 +4,8 @@ import pandas as pd
 import numpy as np
 
 from hesmapy.utils.writer_utils import (
-    _check_data,
+    _check_data_dataframe,
+    _check_data_dict,
     _check_sources,
     _check_hydro1d_units,
     _check_model_names,
@@ -62,7 +63,7 @@ def write_hydro1d_from_dataframe(
     if os.path.exists(path) and not overwrite:
         raise IOError(f"File {path} already exists")
 
-    data = _check_data(data, columns=["time", "density", "radius"])
+    data = _check_data_dataframe(data, columns=["time", "density", "radius"])
 
     model_names = _check_model_names(model_names, len(data))
     sources = _check_sources(sources)
@@ -127,13 +128,7 @@ def write_hydro1d_from_dict(
 
     """
 
-    if isinstance(data, dict):
-        data = [data]
-    elif isinstance(data, list):
-        if not all(isinstance(df, dict) for df in data):
-            raise TypeError("data must be a dict or a list of dicts")
-    else:
-        raise TypeError("data must be a dict or a list of dicts")
+    data = _check_data_dict(data)
 
     data_dfs = []
     for i, df in enumerate(data):
