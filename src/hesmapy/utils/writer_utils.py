@@ -1,11 +1,17 @@
 import pandas as pd
 import numpy as np
 
-from hesmapy.constants import HYDRO1D_SCHEMA, HYDRO1D_ABUNDANCE_REGEX, ARB_UNIT_STRING
+from hesmapy.constants import (
+    HYDRO1D_SCHEMA,
+    HYDRO1D_ABUNDANCE_REGEX,
+    ARB_UNIT_STRING,
+    RT_LIGHTCURVE_JSON_SCHEMA,
+    RT_SPECTRUM_JSON_SCHEMA,
+)
 
 
 def _hydro1d_dataframe_to_json_dict(
-    df: pd.DataFrame, model: str, sources: dict | list[dict] = None, units: dict = None
+    df: pd.DataFrame, model: str, sources: list[dict] = None, units: dict = None
 ) -> dict:
     """
     Convert a DataFrame containing hydrodynamical data to a dictionary
@@ -17,8 +23,8 @@ def _hydro1d_dataframe_to_json_dict(
         DataFrame containing the hydrodynamical data.
     model : str
         Name of the model.
-    sources : dict | list[dict], optional
-        Source(s) of the model, by default None. If None, the source
+    sources : list[dict], optional
+        Source(s) of the model, by default None.
     units : dict, optional
         Units of the model, by default None. If None, the units will
         be set to ARB_UNIT_STRING.
@@ -68,7 +74,7 @@ def _rt_lightcurve_dataframe_to_json_dict(
     df: pd.DataFrame,
     model: str,
     derived_data_df: pd.DataFrame = None,
-    sources: dict | list[dict] = None,
+    sources: list[dict] = None,
     units: dict = None,
 ) -> dict:
     """
@@ -113,11 +119,6 @@ def _rt_lightcurve_dataframe_to_json_dict(
         "viewing_angle",
     ]
 
-    # Add abundance columns
-    for col in df.columns:
-        if HYDRO1D_ABUNDANCE_REGEX.match(col):
-            columns.append(col)
-
     data = []
     for _, row in df.iterrows():
         data_dict = {}
@@ -137,13 +138,66 @@ def _rt_lightcurve_dataframe_to_json_dict(
 
     model_dict = {}
     model_dict["name"] = model
-    model_dict["schema"] = HYDRO1D_SCHEMA
+    model_dict["schema"] = RT_LIGHTCURVE_JSON_SCHEMA
     if sources is not None:
         model_dict["sources"] = sources
     model_dict["units"] = units
     model_dict["data"] = data
     if derived_data is not None:
         model_dict["derived_data"] = derived_data
+
+    return {model: model_dict}
+
+
+def _rt_spectrum_dataframe_to_json_dict(
+    df: list[pd.DataFrame],
+    time: list[float],
+    model: str,
+    sources: list[dict] = None,
+    units: dict = None,
+) -> dict:
+    """
+    Convert a DataFrame containing hydrodynamical data to a dictionary
+    compatible with the HESMA scheme.
+
+    Parameters
+    ----------
+    df : list[pd.DataFrame]
+        List of DataFrames containing the spectra.
+    time : list[float]
+        List of times for each DataFrame.
+    model : str
+        Name of the model.
+    sources : list[dict], optional
+        Source(s) of the model, by default None.
+    units : dict, optional
+        Units of the model, by default None. If None, the units will
+        be set to ARB_UNIT_STRING.
+
+    Returns
+    -------
+    dict
+        Dictionary compatible with the HESMA scheme.
+
+    """
+
+    data = []
+
+    for i, df_data in enumerate(df):
+        data_dict = {}
+        data_dict["wavelength"] = df_data["wavelength"].to_list()
+        data_dict["flux"] = df_data["flux"].to_list()
+        if "flux_err" in df_data.columns:
+            data_dict["flux_err"] = df_data["flux_err"].to_list()
+        data_dict["time"] = time[i]
+
+    model_dict = {}
+    model_dict["name"] = model
+    model_dict["schema"] = RT_SPECTRUM_JSON_SCHEMA
+    if sources is not None:
+        model_dict["sources"] = sources
+    model_dict["units"] = units
+    model_dict["data"] = data
 
     return {model: model_dict}
 
@@ -217,6 +271,27 @@ def _check_rt_lightcurve_units(units: dict, bands: list[str] | None = None) -> d
     return units
 
 
+def _check_rt_spectrum_units(units: dict) -> dict:
+    columns = [
+        "wavelength",
+        "flux",
+        "flux_err",
+        "time",
+    ]
+    if units is not None:
+        if not isinstance(units, dict):
+            raise TypeError("units must be a dict")
+        for col in columns:
+            if col not in units.keys():
+                units[col] = ARB_UNIT_STRING
+    else:
+        units = {}
+        for col in columns:
+            units[col] = ARB_UNIT_STRING
+
+    return units
+
+
 def _check_model_names(model_names: str | list[str], len_data: int) -> list[str]:
     if model_names is None:
         model_names = [f"model_{i}" for i in range(len_data)]
@@ -269,6 +344,39 @@ def _check_data_dataframe(
     return data
 
 
+def _check_nested_data_dataframe(
+    data: pd.DataFrame | list[pd.DataFrame] | list[list[pd.DataFrame]],
+    columns: list[str],
+) -> list[list[pd.DataFrame]]:
+    if isinstance(data, pd.DataFrame):
+        data = [_check_data_dataframe(data, columns)]
+    elif isinstance(data, list):
+        data = [_check_data_dataframe(d, columns) for d in data]
+    else:
+        raise TypeError(
+            "data must be a DataFrame, a list of DataFrames, or a list of lists of DataFrames"
+        )
+
+    return data
+
+
+def _check_time(
+    data: list[list[pd.DataFrame]],
+) -> list[list[float]]:
+    time = []
+    for d in data:
+        time_list = []
+        for df in d:
+            times = df["time"].unique()
+            if len(times) != 1:
+                raise ValueError("Each DataFrame must contain a single unique time")
+            else:
+                time_list.append(times[0])
+        time.append(time_list)
+
+    return time
+
+
 def _check_data_dict(data: dict | list[dict]) -> list[dict]:
     if isinstance(data, dict):
         data = [data]
@@ -277,6 +385,21 @@ def _check_data_dict(data: dict | list[dict]) -> list[dict]:
             raise TypeError("data must be a dict or a list of dicts")
     else:
         raise TypeError("data must be a dict or a list of dicts")
+
+    return data
+
+
+def _check_nested_data_dict(
+    data: dict | list[dict] | list[list[dict]],
+) -> list[list[dict]]:
+    if isinstance(data, dict):
+        data = [_check_data_dict(data)]
+    elif isinstance(data, list):
+        data = [_check_data_dict(d) for d in data]
+    else:
+        raise TypeError(
+            "data must be a dict, a list of dicts, or a list of lists of dicts"
+        )
 
     return data
 
