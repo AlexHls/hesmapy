@@ -2,7 +2,14 @@ import unittest
 import os
 import json
 from tempfile import NamedTemporaryFile
-from hesmapy.base import load_hydro_1d, Hydro1D, load_rt_lightcurve, RTLightcurve
+from hesmapy.base import (
+    load_hydro_1d,
+    Hydro1D,
+    load_rt_lightcurve,
+    RTLightcurve,
+    load_rt_spectrum,
+    RTSpectrum,
+)
 
 
 class TestLoadHydro1D(unittest.TestCase):
@@ -120,6 +127,51 @@ class TestLoadRTLightcurve(unittest.TestCase):
         rt = load_rt_lightcurve(path)
         os.unlink(path)
         self.assertIsInstance(rt, RTLightcurve)
+
+
+class TestLoadRTSpectrum(unittest.TestCase):
+    def setUp(self):
+        self.valid_data = {
+            "model": {
+                "name": "test",
+                "schema": "test_schema",
+                "sources": [
+                    {
+                        "bibcode": "2018ApJ...853..107S",
+                        "reference": "Shen et al. (2018)",
+                        "url": "https://ui.adsabs.harvard.edu/abs/2018ApJ...853..107S/abstract",
+                    }
+                ],
+                "units": {
+                    "time": "test",
+                    "wavelength": "test",
+                    "flux": "test",
+                    "flux_err": "test",
+                },
+                "data": [
+                    {
+                        "time": 1,
+                        "wavelength": [1, 2],
+                        "flux": [1, 2],
+                        "flux_err": [1, 2],
+                    },
+                    {
+                        "time": 2,
+                        "wavelength": [1, 2],
+                        "flux": [1, 2],
+                        "flux_err": [1, 2],
+                    },
+                ],
+            },
+        }
+
+    def test_load_rt_spectrum(self):
+        with NamedTemporaryFile(mode="w", delete=False) as f:
+            json.dump(self.valid_data, f)
+            path = f.name
+        rt = load_rt_spectrum(path)
+        os.unlink(path)
+        self.assertIsInstance(rt, RTSpectrum)
 
 
 if __name__ == "__main__":
