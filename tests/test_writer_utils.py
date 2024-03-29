@@ -273,33 +273,72 @@ class TestWriterUtilsCheckNestedDataDataFrame(unittest.TestCase):
 
     def test_check_valid_nested_data_dataframe_1(self):
         self.assertEqual(
-            _check_nested_data_dataframe(self.df, columns=self.columns),
+            _check_nested_data_dataframe(self.df, columns=self.columns, num_models=1),
             [[self.df]],
         )
 
     def test_check_valid_nested_data_dataframe_2(self):
         self.assertEqual(
-            _check_nested_data_dataframe([self.df, self.df], columns=self.columns),
+            _check_nested_data_dataframe(
+                [self.df, self.df], columns=self.columns, num_models=2
+            ),
             [[self.df], [self.df]],
         )
 
     def test_check_valid_nested_data_dataframe_3(self):
         self.assertEqual(
             _check_nested_data_dataframe(
-                [[self.df, self.df], [self.df, self.df]], columns=self.columns
+                [self.df, self.df], columns=self.columns, num_models=1
             ),
-            [[self.df, self.df], [self.df, self.df]],
+            [[self.df, self.df]],
         )
 
     def test_check_valid_nested_data_dataframe_4(self):
         self.assertEqual(
-            _check_nested_data_dataframe([[self.df]], columns=self.columns),
+            _check_nested_data_dataframe(
+                [[self.df, self.df], [self.df, self.df]],
+                columns=self.columns,
+                num_models=2,
+            ),
+            [[self.df, self.df], [self.df, self.df]],
+        )
+
+    def test_check_valid_nested_data_dataframe_5(self):
+        self.assertEqual(
+            _check_nested_data_dataframe(
+                [[self.df]], columns=self.columns, num_models=1
+            ),
             [[self.df]],
+        )
+
+    def test_check_valid_nested_data_dataframe_6(self):
+        dict_2 = self.dict.copy()
+        dict_2["time"] = [2.0, 2.0, 2.0]
+        df_2 = pd.DataFrame(dict_2)
+        self.assertEqual(
+            _check_nested_data_dataframe(
+                [[self.df, df_2], [df_2, self.df]], self.columns, num_models=2
+            ),
+            [[self.df, df_2], [df_2, self.df]],
         )
 
     def test_check_invalid_nested_data_dataframe(self):
         with self.assertRaises(TypeError):
             _check_nested_data_dataframe(self.dict, columns=self.columns)
+
+    def test_check_invalid_nested_data_dataframe_2(self):
+        with self.assertRaises(ValueError):
+            _check_nested_data_dataframe(
+                [self.df, self.df], columns=self.columns, num_models=3
+            )
+
+    def test_check_invalid_nested_data_dataframe_3(self):
+        with self.assertRaises(ValueError):
+            _check_nested_data_dataframe(
+                [[self.df], [self.df, self.df], [self.df]],
+                columns=self.columns,
+                num_models=2,
+            )
 
 
 class TestWriterUtilsCheckTime(unittest.TestCase):
@@ -387,31 +426,61 @@ class TestWriterUtilsCheckNestedDataDict(unittest.TestCase):
 
     def test_check_valid_nested_data_dict_1(self):
         self.assertEqual(
-            _check_nested_data_dict(self.dict),
+            _check_nested_data_dict(self.dict, num_models=1),
             [[self.dict]],
         )
 
     def test_check_valid_nested_data_dict_2(self):
         self.assertEqual(
-            _check_nested_data_dict([self.dict, self.dict]),
+            _check_nested_data_dict([self.dict, self.dict], num_models=2),
             [[self.dict], [self.dict]],
         )
 
     def test_check_valid_nested_data_dict_3(self):
         self.assertEqual(
-            _check_nested_data_dict([[self.dict, self.dict], [self.dict, self.dict]]),
-            [[self.dict, self.dict], [self.dict, self.dict]],
+            _check_nested_data_dict([self.dict, self.dict], num_models=1),
+            [[self.dict, self.dict]],
         )
 
     def test_check_valid_nested_data_dict_4(self):
         self.assertEqual(
-            _check_nested_data_dict([[self.dict]]),
+            _check_nested_data_dict(
+                [[self.dict, self.dict], [self.dict, self.dict]],
+                num_models=2,
+            ),
+            [[self.dict, self.dict], [self.dict, self.dict]],
+        )
+
+    def test_check_valid_nested_data_dict_5(self):
+        self.assertEqual(
+            _check_nested_data_dict([[self.dict]], num_models=1),
             [[self.dict]],
+        )
+
+    def test_check_valid_nested_data_dict_6(self):
+        dict_2 = self.dict.copy()
+        dict_2["time"] = [2.0, 2.0, 2.0]
+        self.assertEqual(
+            _check_nested_data_dict(
+                [[self.dict, dict_2], [dict_2, self.dict]], num_models=2
+            ),
+            [[self.dict, dict_2], [dict_2, self.dict]],
         )
 
     def test_check_invalid_nested_data_dict(self):
         with self.assertRaises(TypeError):
-            _check_nested_data_dict(pd.DataFrame(self.dict))
+            _check_nested_data_dict(pd.DataFrame(self.dict), num_models=1)
+
+    def test_check_invalid_nested_data_dict_2(self):
+        with self.assertRaises(ValueError):
+            _check_nested_data_dict([self.dict, self.dict], num_models=3)
+
+    def test_check_invalid_nested_data_dict_3(self):
+        with self.assertRaises(ValueError):
+            _check_nested_data_dict(
+                [[self.dict], [self.dict, self.dict], [self.dict]],
+                num_models=2,
+            )
 
 
 class TestWriterUtilsCheckRTLightcurveDerivedData(unittest.TestCase):

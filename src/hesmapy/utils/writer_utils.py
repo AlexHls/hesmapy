@@ -347,11 +347,34 @@ def _check_data_dataframe(
 def _check_nested_data_dataframe(
     data: pd.DataFrame | list[pd.DataFrame] | list[list[pd.DataFrame]],
     columns: list[str],
+    num_models: int,
 ) -> list[list[pd.DataFrame]]:
     if isinstance(data, pd.DataFrame):
         data = [_check_data_dataframe(data, columns)]
     elif isinstance(data, list):
-        data = [_check_data_dataframe(d, columns) for d in data]
+        if all(isinstance(d, pd.DataFrame) for d in data):
+            if num_models == 1:
+                data = [data]
+            elif num_models > 1 and len(data) == num_models:
+                data = [_check_data_dataframe(d, columns) for d in data]
+            else:
+                # We ignore the case where num_models < 1 as this
+                # is an internal function
+                raise ValueError(
+                    "data must have the same length as the number of models"
+                )
+        elif all(isinstance(d, list) for d in data):
+            if num_models == 1 and len(data) == 1:
+                data = [_check_data_dataframe(data[0], columns)]
+            elif num_models > 1 and len(data) == num_models:
+                data_reshaped = []
+                for i in range(num_models):
+                    data_reshaped.append(_check_data_dataframe(data[i], columns))
+                data = data_reshaped
+            else:
+                raise ValueError(
+                    "data must have the same length as the number of models"
+                )
     else:
         raise TypeError(
             "data must be a DataFrame, a list of DataFrames, or a list of lists of DataFrames"
@@ -391,14 +414,37 @@ def _check_data_dict(data: dict | list[dict]) -> list[dict]:
 
 def _check_nested_data_dict(
     data: dict | list[dict] | list[list[dict]],
+    num_models: int,
 ) -> list[list[dict]]:
     if isinstance(data, dict):
         data = [_check_data_dict(data)]
     elif isinstance(data, list):
-        data = [_check_data_dict(d) for d in data]
+        if all(isinstance(d, dict) for d in data):
+            if num_models == 1:
+                data = [data]
+            elif num_models > 1 and len(data) == num_models:
+                data = [_check_data_dict(d) for d in data]
+            else:
+                # We ignore the case where num_models < 1 as this
+                # is an internal function
+                raise ValueError(
+                    "data must have the same length as the number of models"
+                )
+        elif all(isinstance(d, list) for d in data):
+            if num_models == 1 and len(data) == 1:
+                data = [_check_data_dict(data[0])]
+            elif num_models > 1 and len(data) == num_models:
+                data_reshaped = []
+                for i in range(num_models):
+                    data_reshaped.append(_check_data_dict(data[i]))
+                data = data_reshaped
+            else:
+                raise ValueError(
+                    "data must have the same length as the number of models"
+                )
     else:
         raise TypeError(
-            "data must be a dict, a list of dicts, or a list of lists of dicts"
+            "data must be a DataFrame, a list of DataFrames, or a list of lists of DataFrames"
         )
 
     return data
