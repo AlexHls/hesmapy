@@ -6,10 +6,13 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+import datetime
+from hesmapy.__about__ import __version__
+
 project = "Hesmapy"
-copyright = "2023, Alexander Holas"
+copyright = f"2023-{datetime.datetime.now().year}, Alexander Holas"
 author = "Alexander Holas"
-release = "v23.12.1"
+release = f"v{__version__}"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -17,6 +20,7 @@ release = "v23.12.1"
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
+    "sphinx.ext.autosectionlabel",
     "sphinx_copybutton",
 ]
 

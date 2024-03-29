@@ -34,6 +34,7 @@ Contents
 
     installation
     getting_started
+    writers
 
 
 API Reference

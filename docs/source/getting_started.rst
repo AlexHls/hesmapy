@@ -42,7 +42,7 @@ Plot a model:
 
    <iframe src="_static/hydro_1d.html" height=650px" width="100%"></iframe>
 
-Model files can be written by providing either a ``pd.DataFrame``, ``dict`` or several ``np.ndarray``.
+Model files can be written by providing either a ``pd.DataFrame``, ``dict`` or several ``np.ndarray``. See :ref:`writers-hydro` for more information.
 
 .. _getting-started-rt:
 
@@ -78,6 +78,7 @@ Plot a model:
    <iframe src="_static/rt_lightcurve.html" height=850px" width="100%"></iframe>
 
 Model files can be written by providing either a ``pd.DataFrame``, ``dict`` or several ``np.ndarray``.
+See :ref:`writers-rt` for more information.
 
 .. _getting-started-tracer:
 
