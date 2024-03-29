@@ -62,34 +62,55 @@ class TestLoadHydro1D(unittest.TestCase):
 class TestLoadRTLightcurve(unittest.TestCase):
     def setUp(self):
         self.valid_data = {
-            "model": {
+            "test": {
                 "name": "test",
                 "schema": "test_schema",
                 "sources": [
                     {
-                        "bibcode": "test",
-                        "reference": "test",
-                        "url": "test",
+                        "bibcode": "2018ApJ...853..107S",
+                        "reference": "Shen et al. (2018)",
+                        "url": "https://ui.adsabs.harvard.edu/abs/2018ApJ...853..107S/abstract",
                     }
                 ],
                 "units": {
-                    "time": "test",
-                    "band1": "test",
-                    "band2": "test",
+                    "time": "s",
+                    "B": "mag",
                 },
                 "data": [
                     {
-                        "time": 1,
-                        "band1": 1,
-                        "band2": 1,
+                        "time": 1.0,
+                        "band": "B",
+                        "magnitude": 1.0,
+                        "e_magnitude": 0.1,
+                        "viewing_angle": 1,
                     },
                     {
-                        "time": 2,
-                        "band1": 2,
-                        "band2": 2,
+                        "time": 2.0,
+                        "band": "B",
+                        "magnitude": 2.0,
+                        "e_magnitude": 0.2,
+                        "viewing_angle": 1,
+                    },
+                    {
+                        "time": 3.0,
+                        "band": "B",
+                        "magnitude": 3.0,
+                        "e_magnitude": 0.3,
+                        "viewing_angle": 1,
                     },
                 ],
-            },
+                "derived_data": [
+                    {
+                        "peak_mag": 1.0,
+                        "peak_time": 1.0,
+                        "rise_time": 1.0,
+                        "decline_rate_15": 1.0,
+                        "decline_rate_40": 1.0,
+                        "band": "B",
+                        "viewing_angle": 1,
+                    }
+                ],
+            }
         }
 
     def test_load_rt_lightcurve(self):
