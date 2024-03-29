@@ -27,6 +27,12 @@ If you want to use the latest development version, you can install it directly f
    cd hesmapy
    pip install -e .
 
+If you are a developer, please make sure you have the ``pre-commit`` package installed and run
+
+.. code-block:: bash
+
+   pre-commit install
+
 This should install all dependencies automatically.
 If you want to build the documentation, you also need to install the documentation dependencies:
 

@@ -12,10 +12,12 @@ For installation instructions, see :ref:`installation`.
 Hydro
 -----
 
-This module contains the tools for one-dimensional hydro models. See below for some basic usage examples.  
+This module contains the tools for hydrodynamical simulations. See below for some basic usage examples.  
 
 Hydro1D
 ^^^^^^^
+
+One-dimensional hydrodynamical simulations.
 
 Loading models:
 
@@ -47,7 +49,35 @@ Model files can be written by providing either a ``pd.DataFrame``, ``dict`` or s
 RT
 --
 
-`(Not yet implemented)`
+This module contains the tools for radiative transfer simulations. See below for some basic usage examples.  
+
+Lightcurves
+^^^^^^^^^^^
+
+Loading models:
+
+.. code-block:: python
+
+    import hesmapy.base as hp
+    model = hp.load_rt_lightcurve("examples/rt/rt_lightcurve.json")
+
+Get the data from a model as a ``pd.DataFrame``:
+
+.. code-block:: python
+
+    df = model.get_data()
+
+Plot a model:
+
+.. code-block:: python
+
+    model.plot(show_plot=True)
+
+.. raw:: html
+
+   <iframe src="_static/rt_lightcurve.html" height=850px" width="100%"></iframe>
+
+Model files can be written by providing either a ``pd.DataFrame``, ``dict`` or several ``np.ndarray``.
 
 .. _getting-started-tracer:
 

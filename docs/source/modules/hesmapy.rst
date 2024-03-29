@@ -8,6 +8,7 @@ Subpackages
    :maxdepth: 4
 
    hesmapy.hydro
+   hesmapy.rt
    hesmapy.utils
    hesmapy.writers
 
