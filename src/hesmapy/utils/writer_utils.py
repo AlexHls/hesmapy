@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-from hesmapy.constants import HYDRO1D_SCHEMA, HYDRO1D_ABUNDANCE_REGEX
+from hesmapy.constants import HYDRO1D_SCHEMA, HYDRO1D_ABUNDANCE_REGEX, ARB_UNIT_STRING
 
 
 def _hydro1d_dataframe_to_json_dict(
@@ -21,7 +21,7 @@ def _hydro1d_dataframe_to_json_dict(
         Source(s) of the model, by default None. If None, the source
     units : dict, optional
         Units of the model, by default None. If None, the units will
-        be set to "(arb. units)".
+        be set to ARB_UNIT_STRING.
 
     Returns
     -------
@@ -87,7 +87,7 @@ def _rt_lightcurve_dataframe_to_json_dict(
         Source(s) of the model, by default None. If None, the source
     units : dict, optional
         Units of the model, by default None. If None, the units will
-        be set to "(arb. units)".
+        be set to ARB_UNIT_STRING.
 
     Returns
     -------
@@ -183,11 +183,11 @@ def _check_hydro1d_units(units: dict) -> dict:
             raise TypeError("units must be a dict")
         for col in columns:
             if col not in units.keys():
-                units[col] = "(arb. units)"
+                units[col] = ARB_UNIT_STRING
     else:
         units = {}
         for col in columns:
-            units[col] = "(arb. units)"
+            units[col] = ARB_UNIT_STRING
 
     return units
 
@@ -201,18 +201,18 @@ def _check_rt_lightcurve_units(units: dict, bands: list[str] | None = None) -> d
             raise TypeError("units must be a dict")
         for col in columns:
             if col not in units.keys():
-                units[col] = "(arb. units)"
+                units[col] = ARB_UNIT_STRING
         if bands is not None:
             for band in bands:
                 if band not in units.keys():
-                    units[band] = "(arb. units)"
+                    units[band] = ARB_UNIT_STRING
     else:
         units = {}
         for col in columns:
-            units[col] = "(arb. units)"
+            units[col] = ARB_UNIT_STRING
         if bands is not None:
             for band in bands:
-                units[band] = "(arb. units)"
+                units[band] = ARB_UNIT_STRING
 
     return units
 

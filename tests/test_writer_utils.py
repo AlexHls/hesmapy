@@ -14,7 +14,7 @@ from hesmapy.utils.writer_utils import (
     _check_data_dict,
     _check_rt_lightcurve_derived_data,
 )
-from hesmapy.constants import HYDRO1D_SCHEMA
+from hesmapy.constants import HYDRO1D_SCHEMA, ARB_UNIT_STRING
 
 
 class TestWriterUtilsCheckNumpyArray(unittest.TestCase):
@@ -86,22 +86,22 @@ class TestWriterUtilsCheckHydro1DUnits(unittest.TestCase):
             "time": "s",
         }
         self.empty_units = {
-            "radius": "(arb. units)",
-            "density": "(arb. units)",
-            "pressure": "(arb. units)",
-            "temperature": "(arb. units)",
-            "mass": "(arb. units)",
-            "velocity": "(arb. units)",
-            "time": "(arb. units)",
+            "radius": ARB_UNIT_STRING,
+            "density": ARB_UNIT_STRING,
+            "pressure": ARB_UNIT_STRING,
+            "temperature": ARB_UNIT_STRING,
+            "mass": ARB_UNIT_STRING,
+            "velocity": ARB_UNIT_STRING,
+            "time": ARB_UNIT_STRING,
         }
         self.partial_units = {
             "radius": "cm",
             "density": "g/cm^3",
-            "pressure": "(arb. units)",
-            "temperature": "(arb. units)",
-            "mass": "(arb. units)",
-            "velocity": "(arb. units)",
-            "time": "(arb. units)",
+            "pressure": ARB_UNIT_STRING,
+            "temperature": ARB_UNIT_STRING,
+            "mass": ARB_UNIT_STRING,
+            "velocity": ARB_UNIT_STRING,
+            "time": ARB_UNIT_STRING,
         }
 
     def test_check_units_valid_units(self):
@@ -130,16 +130,16 @@ class TestWriterUtilsCheckRTLightcurveUnits(unittest.TestCase):
             "Lbol": "erg/s",
         }
         self.empty_units = {
-            "time": "(arb. units)",
-            "B": "(arb. units)",
-            "V": "(arb. units)",
-            "Lbol": "(arb. units)",
+            "time": ARB_UNIT_STRING,
+            "B": ARB_UNIT_STRING,
+            "V": ARB_UNIT_STRING,
+            "Lbol": ARB_UNIT_STRING,
         }
         self.partial_units = {
             "time": "s",
             "B": "mag",
-            "V": "(arb. units)",
-            "Lbol": "(arb. units)",
+            "V": ARB_UNIT_STRING,
+            "Lbol": ARB_UNIT_STRING,
         }
         self.bands = ["B", "V", "Lbol"]
 

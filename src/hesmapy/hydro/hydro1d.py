@@ -9,7 +9,7 @@ from hesmapy.utils.plot_utils import (
     plot_abundance_traces,
 )
 from hesmapy.hydro.utils import normalize_hydro1d_data, get_abundance_data
-from hesmapy.constants import HYDRO1D_JSON_SCHEMA
+from hesmapy.constants import HYDRO1D_JSON_SCHEMA, ARB_UNIT_STRING
 
 
 class Hydro1D(HesmaBaseJSONFile):
@@ -92,37 +92,37 @@ class Hydro1D(HesmaBaseJSONFile):
         radius_unit = (
             self.data[model]["units"]["radius"]
             if "radius" in self.data[model]["units"]
-            else "(arb. units)"
+            else ARB_UNIT_STRING
         )
         density_unit = (
             self.data[model]["units"]["density"]
             if "density" in self.data[model]["units"]
-            else "(arb. units)"
+            else ARB_UNIT_STRING
         )
         pressure_unit = (
             self.data[model]["units"]["pressure"]
             if "pressure" in self.data[model]["units"]
-            else "(arb. units)"
+            else ARB_UNIT_STRING
         )
         temperature_unit = (
             self.data[model]["units"]["temperature"]
             if "temperature" in self.data[model]["units"]
-            else "(arb. units)"
+            else ARB_UNIT_STRING
         )
         mass_unit = (
             self.data[model]["units"]["mass"]
             if "mass" in self.data[model]["units"]
-            else "(arb. units)"
+            else ARB_UNIT_STRING
         )
         velocity_unit = (
             self.data[model]["units"]["velocity"]
             if "velocity" in self.data[model]["units"]
-            else "(arb. units)"
+            else ARB_UNIT_STRING
         )
         time_unit = (
             self.data[model]["units"]["time"]
             if "time" in self.data[model]["units"]
-            else "(arb. units)"
+            else ARB_UNIT_STRING
         )
         units = {
             "radius": radius_unit,

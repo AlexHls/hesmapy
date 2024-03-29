@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 from hesmapy.json_base import HesmaBaseJSONFile
-from hesmapy.constants import RT_LIGHTCURVE_JSON_SCHEMA
+from hesmapy.constants import RT_LIGHTCURVE_JSON_SCHEMA, ARB_UNIT_STRING
 from hesmapy.utils.plot_utils import (
     plot_lightcurves,
     plot_derived_lightcurve_data,
@@ -151,14 +151,14 @@ class RTLightcurve(HesmaBaseJSONFile):
         time_unit = (
             self.data[model]["units"]["time"]
             if "time" in self.data[model]["units"]
-            else "(arb. units)"
+            else ARB_UNIT_STRING
         )
         units = {
             "time": time_unit,
         }
         for band in unique_bands:
             if band not in self.data[model]["units"]:
-                self.data[model]["units"][band] = "(arb. units)"
+                self.data[model]["units"][band] = ARB_UNIT_STRING
             units[band] = self.data[model]["units"][band]
 
         return units

@@ -3,6 +3,8 @@ import re
 
 from hesmapy.__about__ import __version__
 
+ARB_UNIT_STRING = "(arb. units)"
+
 HESMA_BASE_JSON_SCHEMA = {
     "type": "object",
     "properties": {
