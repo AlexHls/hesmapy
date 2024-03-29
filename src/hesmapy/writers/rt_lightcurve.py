@@ -74,6 +74,8 @@ def write_rt_lightcurve_from_dataframe(
 
     if derived_data is not None:
         derived_data = _check_rt_lightcurve_derived_data(derived_data, len(data))
+    else:
+        derived_data = [None] * len(data)
 
     model_names = _check_model_names(model_names, len(data))
     sources = _check_sources(sources)
@@ -88,7 +90,7 @@ def write_rt_lightcurve_from_dataframe(
 
     for i, df in enumerate(data):
         data_dict = _rt_lightcurve_dataframe_to_json_dict(
-            df, model_names[i], sources, units
+            df, model_names[i], derived_data[i], sources, units
         )
         rt_lightcurve[model_names[i]] = data_dict[model_names[i]]
 

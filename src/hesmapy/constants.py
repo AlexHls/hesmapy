@@ -77,6 +77,9 @@ HYDRO1D_JSON_SCHEMA = {
     "required": ["name", "data"],
 }
 
+RT_LIGHTCURVE_SCHEMA = "https://github.com/AlexHls/hesmapy/blob/v{:s}/SCHEMA.md".format(
+    __version__
+)
 RT_LIGHTCURVE_JSON_SCHEMA = {
     "type": "object",
     "properties": {

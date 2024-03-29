@@ -30,8 +30,6 @@ def _hydro1d_dataframe_to_json_dict(
 
     """
 
-    assert isinstance(df, pd.DataFrame), "df must be a pd.DataFrame"
-
     columns = [
         "radius",
         "density",
@@ -98,16 +96,10 @@ def _rt_lightcurve_dataframe_to_json_dict(
 
     """
 
-    assert isinstance(df, pd.DataFrame), "df must be a pd.DataFrame"
-    if derived_data_df is not None:
-        assert isinstance(
-            derived_data_df, pd.DataFrame
-        ), "derived_data_df must be a pd.DataFrame"
-
     columns = [
         "time",
         "magnitude",
-        "e-magnitude",
+        "e_magnitude",
         "band",
         "viewing_angle",
     ]

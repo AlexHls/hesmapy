@@ -426,7 +426,7 @@ class TestWriterUtilsRTLightcurveDataFrameToJsonDict(unittest.TestCase):
             {
                 "time": [1.0, 2.0, 3.0],
                 "magnitude": [1.0, 2.0, 3.0],
-                "e-magnitude": [1.0, 2.0, 3.0],
+                "e_magnitude": [1.0, 2.0, 3.0],
                 "band": ["B", "B", "B"],
                 "viewing_angle": [1, 1, 1],
             }
@@ -473,21 +473,21 @@ class TestWriterUtilsRTLightcurveDataFrameToJsonDict(unittest.TestCase):
                         {
                             "time": 1.0,
                             "magnitude": 1.0,
-                            "e-magnitude": 1.0,
+                            "e_magnitude": 1.0,
                             "band": "B",
                             "viewing_angle": 1,
                         },
                         {
                             "time": 2.0,
                             "magnitude": 2.0,
-                            "e-magnitude": 2.0,
+                            "e_magnitude": 2.0,
                             "band": "B",
                             "viewing_angle": 1,
                         },
                         {
                             "time": 3.0,
                             "magnitude": 3.0,
-                            "e-magnitude": 3.0,
+                            "e_magnitude": 3.0,
                             "band": "B",
                             "viewing_angle": 1,
                         },
