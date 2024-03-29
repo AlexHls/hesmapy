@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 
+from hesmapy.constants import ARB_UNIT_STRING
 
 ABUNDANCE_COLORS = [
     "#8C564B",
@@ -49,7 +50,7 @@ def add_timestep_slider(
     go.Figure
     """
     if time_unit is None:
-        time_unit = "(arb. units)"
+        time_unit = ARB_UNIT_STRING
 
     steps = []
     for i in range(len(time)):
@@ -65,9 +66,9 @@ def add_timestep_slider(
             ],  # layout attribute
         )
         for j in range(num_data):
-            step["args"][0]["visible"][i * num_data + j] = (
-                True  # Toggle i'th trace to "visible"
-            )
+            step["args"][0]["visible"][
+                i * num_data + j
+            ] = True  # Toggle i'th trace to "visible"
         steps.append(step)
 
     sliders = [
@@ -129,13 +130,13 @@ def add_viewing_angle_slider(
             ],  # layout attribute
         )
         for j in range(num_data[i]):
-            step["args"][0]["visible"][i * num_data[i] + j] = (
-                True  # Toggle i'th trace to "visible"
-            )
+            step["args"][0]["visible"][
+                i * num_data[i] + j
+            ] = True  # Toggle i'th trace to "visible"
         if has_derived_data:
-            step["args"][0]["visible"][total_data + i] = (
-                True  # Toggle i'th table to "visible"
-            )
+            step["args"][0]["visible"][
+                total_data + i
+            ] = True  # Toggle i'th table to "visible"
         steps.append(step)
 
     sliders = [
@@ -508,6 +509,46 @@ def plot_lightcurves(
             col=1,
         )
         num_data += 1
+
+    return num_data
+
+
+def plot_spectra(fig: go.Figure, data: pd.DataFrame, time: float, units: dict) -> int:
+    """
+    Plot spectra data
+
+    Parameters
+    ----------
+    fig : go.Figure
+        Figure to add traces to
+    data : pd.DataFrame
+        Data to plot
+    time : float
+        Time of data
+    units : dict
+        Units of data
+
+    Returns
+    -------
+    int
+    """
+    num_data = 0
+    hovertemplate = (
+        "Flux: %{y:.2e}"
+        + f" {units['flux']}<br>Wavelength: "
+        + "%{x:.2e}"
+        + f" {units['wavelength']}<br>"
+    )
+    fig.add_trace(
+        go.Scatter(
+            visible=False,
+            x=data["wavelength"],
+            y=data["flux"],
+            name=f"{time:.3f} {units['time']}",
+            hovertemplate=hovertemplate,
+        )
+    )
+    num_data += 1  # This is useless for now, maybe it's useful in the future
 
     return num_data
 

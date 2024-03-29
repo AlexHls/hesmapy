@@ -3,6 +3,11 @@ import plotly.graph_objects as go
 
 from hesmapy.json_base import HesmaBaseJSONFile
 from hesmapy.constants import RT_SPECTRUM_JSON_SCHEMA, ARB_UNIT_STRING
+from hesmapy.utils.plot_utils import (
+    plot_spectra,
+    add_timestep_slider,
+    add_log_axis_buttons,
+)
 
 
 class RTSpectrum(HesmaBaseJSONFile):
@@ -145,6 +150,40 @@ class RTSpectrum(HesmaBaseJSONFile):
 
         model = self._get_model(model=model)
 
-        # TODO: Add support for multiple models
+        fig = go.Figure()
 
-        return
+        # TODO: Add support for multiple models
+        unique_times = self.get_unique_times(model=model)
+        units = self.get_units(model=model)
+
+        # Split data into unique time steps
+        for t in unique_times:
+            data = self.get_data(time=t, model=model)
+            num_data = plot_spectra(fig, data, t, units)
+
+        # Make 0th trace visible
+        for j in range(num_data):
+            fig.data[j].visible = True
+
+        # Add a title for the 0th trace
+        if unique_times is not None:
+            title = "Time: " + "{:.4f}".format(unique_times[0]) + " " + units["time"]
+            fig.update_layout(title=title)
+
+        if len(unique_times) > 1:
+            fig = add_timestep_slider(
+                fig, time=unique_times, time_unit=units["time"], num_data=num_data
+            )
+
+        fig.update_layout(xaxis=dict(showexponent="all", exponentformat="none"))
+        fig.update_layout(yaxis=dict(showexponent="all", exponentformat="e"))
+
+        fig = add_log_axis_buttons(fig, axis="y")
+
+        fig.update_xaxes(title_text=f"Wavelength ({units['wavelength']})")
+        fig.update_yaxes(title_text=f"Flux ({units['flux']})")
+
+        if show_plot:
+            fig.show()
+
+        return fig
