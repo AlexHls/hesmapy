@@ -9,6 +9,7 @@ from hesmapy.utils.writer_utils import (
     _check_rt_lightcurve_units,
     _check_sources,
     _hydro1d_dataframe_to_json_dict,
+    _rt_lightcurve_dataframe_to_json_dict,
     _check_data_dataframe,
     _check_data_dict,
     _check_rt_lightcurve_derived_data,
@@ -413,6 +414,90 @@ class TestWriterUtilsHydroDataFrameToJsonDict(unittest.TestCase):
                             "xHe": 0.3,
                             "xNi56": 0.3,
                         },
+                    ],
+                }
+            },
+        )
+
+
+class TestWriterUtilsRTLightcurveDataFrameToJsonDict(unittest.TestCase):
+    def setUp(self):
+        self.df = pd.DataFrame(
+            {
+                "time": [1.0, 2.0, 3.0],
+                "magnitude": [1.0, 2.0, 3.0],
+                "e-magnitude": [1.0, 2.0, 3.0],
+                "band": ["B", "B", "B"],
+                "viewing_angle": [1, 1, 1],
+            }
+        )
+        self.model = "test"
+        self.sources = [
+            {
+                "bibcode": "2019ApJ...871..112S",
+                "reference": "Shen et al. (2019)",
+                "url": "https://ui.adsabs.harvard.edu/abs/2019ApJ...871..112S/abstract",
+            }
+        ]
+        self.units = {
+            "time": "s",
+            "B": "mag",
+        }
+        self.derived_data = pd.DataFrame(
+            {
+                "peak_mag": [1.0],
+                "peak_time": [1.0],
+                "rise_time": [1.0],
+            }
+        )
+        self.maxDiff = None
+
+    def test_rt_lightcurve_dataframe_to_json_dict(self):
+        self.assertEqual(
+            _rt_lightcurve_dataframe_to_json_dict(
+                self.df, self.model, self.derived_data, self.sources, self.units
+            ),
+            {
+                "test": {
+                    "name": "test",
+                    "schema": HYDRO1D_SCHEMA,
+                    "sources": [
+                        {
+                            "bibcode": "2019ApJ...871..112S",
+                            "reference": "Shen et al. (2019)",
+                            "url": "https://ui.adsabs.harvard.edu/abs/2019ApJ...871..112S/abstract",
+                        }
+                    ],
+                    "units": {"time": "s", "B": "mag"},
+                    "data": [
+                        {
+                            "time": 1.0,
+                            "magnitude": 1.0,
+                            "e-magnitude": 1.0,
+                            "band": "B",
+                            "viewing_angle": 1,
+                        },
+                        {
+                            "time": 2.0,
+                            "magnitude": 2.0,
+                            "e-magnitude": 2.0,
+                            "band": "B",
+                            "viewing_angle": 1,
+                        },
+                        {
+                            "time": 3.0,
+                            "magnitude": 3.0,
+                            "e-magnitude": 3.0,
+                            "band": "B",
+                            "viewing_angle": 1,
+                        },
+                    ],
+                    "derived_data": [
+                        {
+                            "peak_mag": 1.0,
+                            "peak_time": 1.0,
+                            "rise_time": 1.0,
+                        }
                     ],
                 }
             },

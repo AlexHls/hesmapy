@@ -30,6 +30,8 @@ def _hydro1d_dataframe_to_json_dict(
 
     """
 
+    assert isinstance(df, pd.DataFrame), "df must be a pd.DataFrame"
+
     columns = [
         "radius",
         "density",
@@ -67,7 +69,7 @@ def _hydro1d_dataframe_to_json_dict(
 def _rt_lightcurve_dataframe_to_json_dict(
     df: pd.DataFrame,
     model: str,
-    derived_data: pd.DataFrame = None,
+    derived_data_df: pd.DataFrame = None,
     sources: dict | list[dict] = None,
     units: dict = None,
 ) -> dict:
@@ -81,7 +83,7 @@ def _rt_lightcurve_dataframe_to_json_dict(
         DataFrame containing the hydrodynamical data.
     model : str
         Name of the model.
-    derived_data : pd.DataFrame, optional
+    derived_data_df : pd.DataFrame, optional
         DataFrame containing the derived data, by default None.
     sources : dict | list[dict], optional
         Source(s) of the model, by default None. If None, the source
@@ -95,6 +97,12 @@ def _rt_lightcurve_dataframe_to_json_dict(
         Dictionary compatible with the HESMA scheme.
 
     """
+
+    assert isinstance(df, pd.DataFrame), "df must be a pd.DataFrame"
+    if derived_data_df is not None:
+        assert isinstance(
+            derived_data_df, pd.DataFrame
+        ), "derived_data_df must be a pd.DataFrame"
 
     columns = [
         "time",
@@ -126,9 +134,9 @@ def _rt_lightcurve_dataframe_to_json_dict(
                 data_dict[col] = row[col]
         data.append(data_dict)
 
-    if derived_data is not None:
+    if derived_data_df is not None:
         derived_data = []
-        for _, row in derived_data.iterrows():
+        for _, row in derived_data_df.iterrows():
             derived_data_dict = {}
             for col in derived_columns:
                 if col in row:
