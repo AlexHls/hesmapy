@@ -135,3 +135,48 @@ RT_LIGHTCURVE_JSON_SCHEMA = {
     },
     "required": ["name", "data"],
 }
+
+RT_SPECTRUM_SCHEMA = "https://github.com/AlexHls/hesmapy/blob/v{:s}/SCHEMA.md".format(
+    __version__
+)
+RT_SPECTRUM_JSON_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "name": {"type": "string"},
+        "schema": {"type": "string"},
+        "sources": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "bibcode": {"type": "string"},
+                    "reference": {"type": "string"},
+                    "url": {"type": "string"},
+                },
+            },
+        },
+        "units": {
+            "type": "object",
+            "properties": {
+                "time": {"type": "string"},
+                "wavelength": {"type": "string"},
+                "flux": {"type": "string"},
+            },
+        },
+        "data": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "properties": {
+                    "time": {"type": "number"},
+                    "wavelength": {"type": "array", "items": {"type": "number"}},
+                    "flux": {"type": "array", "items": {"type": "number"}},
+                    "flux_err": {"type": "array", "items": {"type": "number"}},
+                },
+                "required": ["time", "wavelength", "flux"],
+            },
+        },
+    },
+    "required": ["name", "data"],
+}
