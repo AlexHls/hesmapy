@@ -39,9 +39,10 @@ creating a ``json`` file (containing the corresponding commithash), and a name k
         "name": "rt_model_name"
     }
 }
+```
 
 ### Lightcurves
-```
+
 Each file may contain various properties:
 
 | Field | Description | Type | Required |  
