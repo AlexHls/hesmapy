@@ -210,6 +210,9 @@ def _check_rt_lightcurve_units(units: dict, bands: list[str] | None = None) -> d
         units = {}
         for col in columns:
             units[col] = "(arb. units)"
+        if bands is not None:
+            for band in bands:
+                units[band] = "(arb. units)"
 
     return units
 

@@ -9,7 +9,6 @@ from hesmapy.utils.writer_utils import (
     _check_rt_lightcurve_units,
     _check_sources,
     _hydro1d_dataframe_to_json_dict,
-    _rt_lightcurve_dataframe_to_json_dict,
     _check_data_dataframe,
     _check_data_dict,
     _check_rt_lightcurve_derived_data,
@@ -74,7 +73,7 @@ class TestWriterUtilsCheckModelNames(unittest.TestCase):
             _check_model_names(self.dup_model_names_list, 2)
 
 
-class TestWriterUtilsCheckUnits(unittest.TestCase):
+class TestWriterUtilsCheckHydro1DUnits(unittest.TestCase):
     def setUp(self):
         self.valid_units = {
             "radius": "cm",
@@ -117,6 +116,50 @@ class TestWriterUtilsCheckUnits(unittest.TestCase):
     def test_check_units_incomplete_units(self):
         self.assertEqual(
             _check_hydro1d_units({"radius": "cm", "density": "g/cm^3"}),
+            self.partial_units,
+        )
+
+
+class TestWriterUtilsCheckRTLightcurveUnits(unittest.TestCase):
+    def setUp(self):
+        self.valid_units = {
+            "time": "s",
+            "B": "mag",
+            "V": "mag",
+            "Lbol": "erg/s",
+        }
+        self.empty_units = {
+            "time": "(arb. units)",
+            "B": "(arb. units)",
+            "V": "(arb. units)",
+            "Lbol": "(arb. units)",
+        }
+        self.partial_units = {
+            "time": "s",
+            "B": "mag",
+            "V": "(arb. units)",
+            "Lbol": "(arb. units)",
+        }
+        self.bands = ["B", "V", "Lbol"]
+
+    def test_check_units_valid_units(self):
+        self.assertEqual(
+            _check_rt_lightcurve_units(self.valid_units, bands=self.bands),
+            self.valid_units,
+        )
+
+    def test_check_units_empty(self):
+        self.assertEqual(
+            _check_rt_lightcurve_units(None, bands=self.bands), self.empty_units
+        )
+
+    def test_check_units_invalid_units(self):
+        with self.assertRaises(TypeError):
+            _check_rt_lightcurve_units("invalid_units", bands=self.bands)
+
+    def test_check_units_incomplete_units(self):
+        self.assertEqual(
+            _check_rt_lightcurve_units({"time": "s", "B": "mag"}, bands=self.bands),
             self.partial_units,
         )
 
