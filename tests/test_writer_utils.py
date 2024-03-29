@@ -11,7 +11,10 @@ from hesmapy.utils.writer_utils import (
     _hydro1d_dataframe_to_json_dict,
     _rt_lightcurve_dataframe_to_json_dict,
     _check_data_dataframe,
+    _check_nested_data_dataframe,
+    _check_time,
     _check_data_dict,
+    _check_nested_data_dict,
     _check_rt_lightcurve_derived_data,
 )
 from hesmapy.constants import HYDRO1D_SCHEMA, ARB_UNIT_STRING
@@ -252,6 +255,87 @@ class TestWriterUtilsCheckDataDataFrame(unittest.TestCase):
             _check_data_dataframe(self.df, columns=["invalid_column"])
 
 
+class TestWriterUtilsCheckNestedDataDataFrame(unittest.TestCase):
+    def setUp(self):
+        self.dict = {
+            "radius": [1.0, 2.0, 3.0],
+            "density": [1.0, 2.0, 3.0],
+            "pressure": [1.0, 2.0, 3.0],
+            "temperature": [1.0, 2.0, 3.0],
+            "mass": [1.0, 2.0, 3.0],
+            "velocity": [1.0, 2.0, 3.0],
+            "time": [1.0, 1.0, 1.0],
+            "xHe": [0.1, 0.2, 0.3],
+            "xNi56": [0.1, 0.2, 0.3],
+        }
+        self.df = pd.DataFrame(self.dict)
+        self.columns = ["time", "density", "radius"]
+
+    def test_check_valid_nested_data_dataframe_1(self):
+        self.assertEqual(
+            _check_nested_data_dataframe(self.df, columns=self.columns),
+            [[self.df]],
+        )
+
+    def test_check_valid_nested_data_dataframe_2(self):
+        self.assertEqual(
+            _check_nested_data_dataframe([self.df, self.df], columns=self.columns),
+            [[self.df], [self.df]],
+        )
+
+    def test_check_valid_nested_data_dataframe_3(self):
+        self.assertEqual(
+            _check_nested_data_dataframe(
+                [[self.df, self.df], [self.df, self.df]], columns=self.columns
+            ),
+            [[self.df, self.df], [self.df, self.df]],
+        )
+
+    def test_check_valid_nested_data_dataframe_4(self):
+        self.assertEqual(
+            _check_nested_data_dataframe([[self.df]], columns=self.columns),
+            [[self.df]],
+        )
+
+    def test_check_invalid_nested_data_dataframe(self):
+        with self.assertRaises(TypeError):
+            _check_nested_data_dataframe(self.dict, columns=self.columns)
+
+
+class TestWriterUtilsCheckTime(unittest.TestCase):
+    def setUp(self):
+        self.valid_data = {
+            "time": [1.0, 1.0, 1.0],
+            "wavelength": [1.0, 2.0, 3.0],
+            "flux": [1.0, 2.0, 3.0],
+        }
+        self.invalid_data = {
+            "time": [1.0, 2.0, 3.0],
+            "wavelength": [1.0, 2.0, 3.0],
+            "flux": [1.0, 2.0, 3.0],
+        }
+        self.valid_df = pd.DataFrame(self.valid_data)
+        self.invalid_df = pd.DataFrame(self.invalid_data)
+
+    def test_check_valid_time(self):
+        self.assertEqual(_check_time([[self.valid_df]]), [[1.0]])
+
+    def test_check_valid_time_2(self):
+        self.assertEqual(_check_time([[self.valid_df, self.valid_df]]), [[1.0, 1.0]])
+
+    def test_check_valid_time_3(self):
+        self.assertEqual(
+            _check_time(
+                [[self.valid_df, self.valid_df], [self.valid_df, self.valid_df]]
+            ),
+            [[1.0, 1.0], [1.0, 1.0]],
+        )
+
+    def test_check_invalid_time(self):
+        with self.assertRaises(ValueError):
+            _check_time([[self.invalid_df]])
+
+
 class TestWriterUtilsCheckDataDict(unittest.TestCase):
     def setUp(self):
         self.dict = {
@@ -285,6 +369,49 @@ class TestWriterUtilsCheckDataDict(unittest.TestCase):
     def test_check_invalid_data_dict_2(self):
         with self.assertRaises(TypeError):
             _check_data_dict([self.dict, pd.DataFrame(self.dict)])
+
+
+class TestWriterUtilsCheckNestedDataDict(unittest.TestCase):
+    def setUp(self):
+        self.dict = {
+            "radius": [1.0, 2.0, 3.0],
+            "density": [1.0, 2.0, 3.0],
+            "pressure": [1.0, 2.0, 3.0],
+            "temperature": [1.0, 2.0, 3.0],
+            "mass": [1.0, 2.0, 3.0],
+            "velocity": [1.0, 2.0, 3.0],
+            "time": [1.0, 1.0, 1.0],
+            "xHe": [0.1, 0.2, 0.3],
+            "xNi56": [0.1, 0.2, 0.3],
+        }
+
+    def test_check_valid_nested_data_dict_1(self):
+        self.assertEqual(
+            _check_nested_data_dict(self.dict),
+            [[self.dict]],
+        )
+
+    def test_check_valid_nested_data_dict_2(self):
+        self.assertEqual(
+            _check_nested_data_dict([self.dict, self.dict]),
+            [[self.dict], [self.dict]],
+        )
+
+    def test_check_valid_nested_data_dict_3(self):
+        self.assertEqual(
+            _check_nested_data_dict([[self.dict, self.dict], [self.dict, self.dict]]),
+            [[self.dict, self.dict], [self.dict, self.dict]],
+        )
+
+    def test_check_valid_nested_data_dict_4(self):
+        self.assertEqual(
+            _check_nested_data_dict([[self.dict]]),
+            [[self.dict]],
+        )
+
+    def test_check_invalid_nested_data_dict(self):
+        with self.assertRaises(TypeError):
+            _check_nested_data_dict(pd.DataFrame(self.dict))
 
 
 class TestWriterUtilsCheckRTLightcurveDerivedData(unittest.TestCase):

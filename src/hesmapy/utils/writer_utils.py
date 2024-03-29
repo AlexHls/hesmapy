@@ -5,8 +5,8 @@ from hesmapy.constants import (
     HYDRO1D_SCHEMA,
     HYDRO1D_ABUNDANCE_REGEX,
     ARB_UNIT_STRING,
-    RT_LIGHTCURVE_JSON_SCHEMA,
-    RT_SPECTRUM_JSON_SCHEMA,
+    RT_LIGHTCURVE_SCHEMA,
+    RT_SPECTRUM_SCHEMA,
 )
 
 
@@ -138,7 +138,7 @@ def _rt_lightcurve_dataframe_to_json_dict(
 
     model_dict = {}
     model_dict["name"] = model
-    model_dict["schema"] = RT_LIGHTCURVE_JSON_SCHEMA
+    model_dict["schema"] = RT_LIGHTCURVE_SCHEMA
     if sources is not None:
         model_dict["sources"] = sources
     model_dict["units"] = units
@@ -193,7 +193,7 @@ def _rt_spectrum_dataframe_to_json_dict(
 
     model_dict = {}
     model_dict["name"] = model
-    model_dict["schema"] = RT_SPECTRUM_JSON_SCHEMA
+    model_dict["schema"] = RT_SPECTRUM_SCHEMA
     if sources is not None:
         model_dict["sources"] = sources
     model_dict["units"] = units

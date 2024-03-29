@@ -214,6 +214,14 @@ def write_rt_spectrum_from_numpy(
 
     """
 
+    if isinstance(model_names, list):
+        if len(model_names) > 1:
+            raise ValueError(
+                "This function only allows to write one model at a time. "
+                "For multiple models, use the write_rt_spectrum_from_dataframe "
+                "or write_rt_spectrum_from_dict functions."
+            )
+
     wavelength = _check_numpy_array(wavelength)
     flux = _check_numpy_array(flux)
     if flux_err is not None:
