@@ -77,6 +77,32 @@ Plot a model:
 
    <iframe src="_static/rt_lightcurve.html" height=850px" width="100%"></iframe>
 
+Spectra
+^^^^^^^
+
+Loading models:
+
+.. code-block:: python
+
+    import hesmapy.base as hp
+    model = hp.load_rt_lightcurve("examples/rt/rt_spectrum.json")
+
+Get the data from a model as a list of ``pd.DataFrame`` (one for each timestep):
+
+.. code-block:: python
+
+    dfs = model.get_data()
+
+Plot a model:
+
+.. code-block:: python
+
+    model.plot(show_plot=True)
+
+.. raw:: html
+
+   <iframe src="_static/rt_spectrum.html" height=650px" width="100%"></iframe>
+
 Model files can be written by providing either a ``pd.DataFrame``, ``dict`` or several ``np.ndarray``.
 See :ref:`writers-rt` for more information.
 

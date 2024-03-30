@@ -120,3 +120,69 @@ You can optionally provide additional information such as units, sources etc. as
 
 Note that the derived data has to contain the band and viewing angle information in separate columns as well.
 The column names of the ``units`` dictionary should match the ``band`` names in the ``data`` and ``derived_data`` DataFrames.
+
+Spectra
+^^^^^^^
+
+Assume you have a spectral time series:
+
+.. code-block:: python
+
+    import pandas as pd
+
+    spec_1 = pd.DataFrame(
+        {
+            "wavelength": [1, 2, 3, 4, 5],
+            "flux": [1, 2, 3, 4, 5],
+            "flux_err": [0.1, 0.2, 0.3, 0.4, 0.5],
+        }
+    )
+    spec_2 = pd.DataFrame(
+        {
+            "wavelength": [1, 2, 3, 4, 5],
+            "flux": [1, 2, 3, 4, 5],
+            "flux_err": [0.1, 0.2, 0.3, 0.4, 0.5],
+        }
+    )
+    time = [21, 45]
+    num_models = 1 # Number of models, NOT the number of spectra in the time series
+
+
+First, the time has to be added to each ``pd.DataFrame``:
+
+.. code-block:: python
+
+    spec_1["time"] = [21] * len(spec_1)
+    spec_2["time"] = [45] * len(spec_2)
+
+
+This is necessary so the sorting of the spectra to the correct time is possible,
+in particular if more complex files are written, e.g. with multiple models with
+different numbers of spectra.
+You can write this data to a hesma file using the following code:
+
+.. code-block:: python
+
+    from hesmapy.writers.rt_spectrum import write_spectrum_from_dataframe
+
+    write_spectrum_from_dataframe([spec_1, spec_2], num_models, "spectra.json")
+
+
+You can optionally provide additional information such as units, sources etc.:
+
+.. code-block:: python
+
+    write_spectrum_from_dataframe(
+        [spec_1, spec_2],
+        num_models,
+        "spectra.json",
+        model_name="My Model",
+        units={"wavelength": "Angstrom", "flux": "erg/s/cm^2/Angstrom", "time": "days"},
+        sources={"bibcode": "2018ApJ...853..107S"},
+    )
+
+
+Note that when writing multiple models in a single file, the output is very
+sensitive to the list order and shape. The writer will try to sort the spectra
+accordingly, but there may be some edge cases where the output is not as expected.
+It is recommended to double check the output file in such cases.
