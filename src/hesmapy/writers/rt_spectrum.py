@@ -15,11 +15,22 @@ from hesmapy.utils.writer_utils import (
 )
 
 
+class SpecEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super(SpecEncoder, self).default(obj)
+
+
 # This is the base rt_spectrum writer. All other writers should be wrappers
 # around this one.
 def write_rt_spectrum_from_dataframe(
     data: pd.DataFrame | list[pd.DataFrame] | list[list[pd.DataFrame]],
-    time: float | list[float] | list[list[float]],
+    num_models: int,
     path: str,
     model_names: str | list[str] = None,
     sources: dict | list[dict] = None,
@@ -36,6 +47,10 @@ def write_rt_spectrum_from_dataframe(
     data : pd.DataFrame | list[pd.DataFrame] | list[list[pd.DataFrame]]
         DataFrame or list of DataFrames containing the
         spectral data and time.
+    num_models : int
+        Number of models to write. This is used to check
+        if the number of models is consistent with the
+        shape of the data and the number of model names.
     path : str
         Path to the JSON file.
     model_names : str | list[str], optional
@@ -68,10 +83,12 @@ def write_rt_spectrum_from_dataframe(
     if os.path.exists(path) and not overwrite:
         raise IOError(f"File {path} already exists")
 
-    data = _check_nested_data_dataframe(data, columns=["wavelength", "flux", "time"])
+    data = _check_nested_data_dataframe(
+        data, columns=["wavelength", "flux", "time"], num_models=num_models
+    )
     time = _check_time(data)
 
-    model_names = _check_model_names(model_names, len(data))
+    model_names = _check_model_names(model_names, num_models)
     sources = _check_sources(sources)
 
     units = _check_rt_spectrum_units(units)
@@ -80,7 +97,7 @@ def write_rt_spectrum_from_dataframe(
 
     for i, model in enumerate(model_names):
         data_dict = _rt_spectrum_dataframe_to_json_dict(
-            data[i], time[i], sources, units
+            data[i], time[i], model, sources=sources, units=units
         )
         rt_spectrum[model] = data_dict[model]
 
@@ -90,12 +107,15 @@ def write_rt_spectrum_from_dataframe(
         and os.path.dirname(path) != ""
     ):
         os.makedirs(os.path.dirname(path), exist_ok=True)
+
     with open(path, "w") as f:
-        json.dump(rt_spectrum, f)
+        # SpecEncoder is used to serialize numpy arrays and ints
+        json.dump(rt_spectrum, f, cls=SpecEncoder)
 
 
 def write_rt_spectrum_from_dict(
     data: dict | list[dict] | list[list[dict]],
+    num_models: int,
     path: str,
     model_names: str | list[str] = None,
     sources: dict | list[dict] = None,
@@ -112,6 +132,10 @@ def write_rt_spectrum_from_dict(
     data : dict | list[dict] | list[list[dict]]
         Dictionary or list of dictionaries containing the
         lightcurve data.
+    num_models : int
+        Number of models to write. This is used to check
+        if the number of models is consistent with the
+        shape of the data and the number of model names.
     path : str
         Path to the JSON file.
     derived_data : dict | list[dict], optional
@@ -143,14 +167,15 @@ def write_rt_spectrum_from_dict(
 
     """
 
-    data = _check_nested_data_dict(data)
+    data = _check_nested_data_dict(data, num_models=num_models)
 
     data_dfs = []
-    for d in data:
-        data_dfs.append(pd.DataFrame(d))
+    for i in range(num_models):
+        data_dfs.append([pd.DataFrame(d) for d in data[i]])
 
     write_rt_spectrum_from_dataframe(
         data_dfs,
+        num_models,
         path,
         model_names=model_names,
         sources=sources,
@@ -257,6 +282,7 @@ def write_rt_spectrum_from_numpy(
 
     write_rt_spectrum_from_dataframe(
         data_dfs,
+        1,
         path,
         model_names=model_names,
         sources=sources,

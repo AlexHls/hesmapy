@@ -79,7 +79,6 @@ class TestHydro1D(unittest.TestCase):
     def test_get_abundance_data(self):
         data = pd.DataFrame(self.valid_data["model"]["data"])
         abundances = get_abundance_data(data, 1)
-        print(abundances)
         self.assertEqual(abundances["xC12"].iloc[1], 0.9)
 
     def test_get_abundance_data_empty(self):

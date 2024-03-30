@@ -22,6 +22,7 @@ class TestRTLightcurveWriter(unittest.TestCase):
             "e_magnitude": [0.1, 0.2, 0.3],
             "viewing_angle": [1, 1, 1],
         }
+        self.df = pd.DataFrame(self.data)
         self.derived_data = {
             "peak_mag": [1.0],
             "peak_time": [1.0],
@@ -31,6 +32,7 @@ class TestRTLightcurveWriter(unittest.TestCase):
             "band": ["B"],
             "viewing_angle": [1],
         }
+        self.derived_df = pd.DataFrame(self.derived_data)
         self.model_names = "test"
         self.sources = {
             "bibcode": "2018ApJ...853..107S",
@@ -95,14 +97,12 @@ class TestRTLightcurveWriter(unittest.TestCase):
         self.maxDiff = None
 
     def test_write_rt_lightcurve_from_dataframe(self):
-        df = pd.DataFrame(self.data)
-        derived_df = pd.DataFrame(self.derived_data)
         with NamedTemporaryFile(mode="w+b", delete=False) as f:
             path = f.name
             write_rt_lightcurve_from_dataframe(
-                df,
+                self.df,
                 path,
-                derived_df,
+                self.derived_df,
                 self.model_names,
                 self.sources,
                 self.units,
@@ -114,10 +114,8 @@ class TestRTLightcurveWriter(unittest.TestCase):
         self.assertEqual(json_data, self.expected_json)
 
     def test_write_rt_lightcurve_form_dataframe_2(self):
-        df_single = pd.DataFrame(self.data)
-        df = [df_single, df_single]
-        derived_df_single = pd.DataFrame(self.derived_data)
-        derived_df = [derived_df_single, derived_df_single]
+        df = [self.df, self.df]
+        derived_df = [self.derived_df, self.derived_df]
         expected_json = {
             "test1": self.expected_json["test"].copy(),
             "test2": self.expected_json["test"].copy(),

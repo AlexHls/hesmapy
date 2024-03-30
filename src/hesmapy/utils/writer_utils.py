@@ -190,6 +190,7 @@ def _rt_spectrum_dataframe_to_json_dict(
         if "flux_err" in df_data.columns:
             data_dict["flux_err"] = df_data["flux_err"].to_list()
         data_dict["time"] = time[i]
+        data.append(data_dict)
 
     model_dict = {}
     model_dict["name"] = model

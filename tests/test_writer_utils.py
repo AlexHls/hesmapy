@@ -10,6 +10,7 @@ from hesmapy.utils.writer_utils import (
     _check_sources,
     _hydro1d_dataframe_to_json_dict,
     _rt_lightcurve_dataframe_to_json_dict,
+    _rt_spectrum_dataframe_to_json_dict,
     _check_data_dataframe,
     _check_nested_data_dataframe,
     _check_time,
@@ -17,7 +18,11 @@ from hesmapy.utils.writer_utils import (
     _check_nested_data_dict,
     _check_rt_lightcurve_derived_data,
 )
-from hesmapy.constants import HYDRO1D_SCHEMA, ARB_UNIT_STRING
+from hesmapy.constants import (
+    HYDRO1D_SCHEMA,
+    ARB_UNIT_STRING,
+    RT_LIGHTCURVE_SCHEMA,
+)
 
 
 class TestWriterUtilsCheckNumpyArray(unittest.TestCase):
@@ -656,7 +661,7 @@ class TestWriterUtilsRTLightcurveDataFrameToJsonDict(unittest.TestCase):
             {
                 "test": {
                     "name": "test",
-                    "schema": HYDRO1D_SCHEMA,
+                    "schema": RT_LIGHTCURVE_SCHEMA,
                     "sources": [
                         {
                             "bibcode": "2019ApJ...871..112S",
@@ -696,6 +701,76 @@ class TestWriterUtilsRTLightcurveDataFrameToJsonDict(unittest.TestCase):
                         }
                     ],
                 }
+            },
+        )
+
+
+class TestWriterUtilsRTSpectrumDataFrameToJsonDict(unittest.TestCase):
+    def setUp(self):
+        self.data = [
+            pd.DataFrame(
+                {
+                    "wavelength": [1, 2, 3],
+                    "flux": [1, 2, 3],
+                }
+            ),
+            pd.DataFrame(
+                {
+                    "wavelength": [4, 5, 6],
+                    "flux": [4, 5, 6],
+                }
+            ),
+        ]
+        self.time = [1.0, 2.0]
+        self.model = "test"
+        self.sources = [
+            {
+                "bibcode": "2019ApJ...871..112S",
+                "reference": "Shen et al. (2019)",
+                "url": "https://ui.adsabs.harvard.edu/abs/2019ApJ...871..112S/abstract",
+            }
+        ]
+        self.units = {
+            "time": "s",
+            "wavelength": "Angstrom",
+            "flux": "erg/s",
+        }
+        self.maxDiff = None
+
+    def test_rt_spectrum_dataframe_to_json_dict(self):
+        self.assertEqual(
+            _rt_spectrum_dataframe_to_json_dict(
+                self.data, self.time, self.model, self.sources, self.units
+            ),
+            {
+                "test": {
+                    "name": "test",
+                    "schema": RT_LIGHTCURVE_SCHEMA,
+                    "sources": [
+                        {
+                            "bibcode": "2019ApJ...871..112S",
+                            "reference": "Shen et al. (2019)",
+                            "url": "https://ui.adsabs.harvard.edu/abs/2019ApJ...871..112S/abstract",
+                        }
+                    ],
+                    "units": {
+                        "time": "s",
+                        "wavelength": "Angstrom",
+                        "flux": "erg/s",
+                    },
+                    "data": [
+                        {
+                            "time": 1.0,
+                            "wavelength": [1, 2, 3],
+                            "flux": [1, 2, 3],
+                        },
+                        {
+                            "time": 2.0,
+                            "wavelength": [4, 5, 6],
+                            "flux": [4, 5, 6],
+                        },
+                    ],
+                },
             },
         )
 
