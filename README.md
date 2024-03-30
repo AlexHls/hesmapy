@@ -63,6 +63,24 @@ Plot a model:
 ```
 model.plot(show_plot=True)
 ```
+
+#### Lightcurves
+This module contains the tools for spectra(l timeseries). See below for some basic usage examples.
+
+Loading models:
+```python
+import hesmapy.base as hp
+model = hp.load_rt_spectrum("examples/rt/rt_lightcurve.json")
+```
+Get the data from a model as a list of ``pd.DataFrame`` (one for each timestep):
+```python
+dfs = model.get_data()
+```
+Plot a model:
+```
+model.plot(show_plot=True)``````
+
+
 Model files can be written by providing either a ``pd.DataFrame``, ``dict`` or several ``np.ndarray``.
 See the documentation for more details.
 
