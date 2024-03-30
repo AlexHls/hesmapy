@@ -117,6 +117,62 @@ Furthermore, there should be only one ``peak_mag`` value etc. per band and viewi
 
 For a valid example file, see the template file ``examples/rt/rt_lightcurve.json``
 
+
+### Spectra
+
+Each file may contain various properties:
+
+| Field | Description | Type | Required |  
+|-------|-------------|------|----------|
+| ``name`` | Name of the simulation, e.g. 'wd_m090_r0' | String | Yes |   
+| ``schema`` | ``json`` schema used for the creation of the file | String | No |  
+| ``sources`` | Bibliographic resources which relate to the models stored in the file | Array | No |
+| ``units`` | Physical units of the data stored in the file. Mostly used for the correct plot label display | Object | No |
+| ``data`` | Model data containing various physical quantities and timesteps | Array | Yes |
+
+To be usable by ``hesmapy`` (in a meaningful way), a file needs to contain at least the ``name`` and ``data`` fields.
+The above listed array and object fields (``sources``, ``units``, ``data``) contain a variety of other fields as listed below:
+
+``sources``:
+A file can contain multiple sources if the data collectively was produced throughout multiple publications.
+If, however, separate subsets of data have been produced by individual publications, consider splitting up the data
+into multiple files to ensure proper attributing of each subset to an individual reference.
+
+| Field | Description | Type | Required |
+|-------|-------------|------|----------|
+| ``bibcode`` | Bibcode of the reference. Preferably in the ADS style | String | No |
+| ``reference`` | Display name of the reference, e.g. Pakmor et al. (2022) | String | No |
+| ``url`` | URL of the specified reference, preferably a DOI is provided | String | No |
+
+``units``:
+While the data itself is stored agnostic to any unit system, it can be useful to provide information on the provided units
+(especially if the data is not stored in cgs-units). This information is mostly used to display the correct labels in
+plots, if none are provided plots will only show *arb. unit*. As such it is **strongly** discouraged to store data with
+different physical units in the same file as it will be impossible to tell which data point has which unit.
+
+| Field | Description | Type | Required |
+|-------|-------------|------|----------|
+| ``time`` | Unit of the time data field | String | No |
+| ``wavelength`` | Unit of the wavelength data field | String | No |
+| ``flux`` | Unit of the flux data field | String | No |
+
+``data``:
+This field contains the actual spectral. While various quantities can be provided, not all need to be present.
+To pass the validation, the ``time``, ``wavelength`` and ``flux`` fields need to be present.
+This is again mostly to ensure that the plotting works
+correctly, rather than an actual data required. 
+Furthermore, at least two data points are required in a valid model.
+
+| Field | Description | Type | Required |
+|-------|-------------|------|----------|
+| ``time`` | The time data field | Number | Yes |
+| ``wavelength`` | The wavelength array | Array (of Numbers) | Yes |
+| ``flux`` | The flux array | Array (of Numbers) | Yes |
+| ``flux_err`` | The flux array | Array (of Numbers) | Yes |
+
+For a valid example file, see the template file ``examples/rt/rt_spectrum.json``
+
+
 ## Hydro
 
 Hydrodynamical simulations are stored depending on the dimensionality of the data. In particular, one-dimensional
