@@ -17,8 +17,8 @@ Welcome to Hesmapy's documentation!
         :target: https://pypi.python.org/pypi/hesmapy
         :alt: PyPI - Downloads
 
-.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.10404977.svg
-        :target: https://doi.org/10.5281/zenodo.10404977
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.10935383.svg
+        :target: https://doi.org/10.5281/zenodo.10935383
 
 Hesmapy is a Python package providing a set of tools to work with the data from the HESMA.
 It introduces a new data sturcture for the HESMA data in an attempt to make the data more accessible and easier to work with.
