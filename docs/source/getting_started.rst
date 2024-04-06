@@ -85,7 +85,7 @@ Loading models:
 .. code-block:: python
 
     import hesmapy.base as hp
-    model = hp.load_rt_lightcurve("examples/rt/rt_spectrum.json")
+    model = hp.load_rt_spectrum("examples/rt/rt_spectrum.json")
 
 Get the data from a model as a list of ``pd.DataFrame`` (one for each timestep):
 
