@@ -64,7 +64,7 @@ Plot a model:
 model.plot(show_plot=True)
 ```
 
-#### Lightcurves
+#### Spectra
 This module contains the tools for spectra(l timeseries). See below for some basic usage examples.
 
 Loading models:
