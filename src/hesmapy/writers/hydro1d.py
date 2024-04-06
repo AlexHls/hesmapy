@@ -4,8 +4,10 @@ import pandas as pd
 import numpy as np
 
 from hesmapy.utils.writer_utils import (
+    _check_data_dataframe,
+    _check_data_dict,
     _check_sources,
-    _check_units,
+    _check_hydro1d_units,
     _check_model_names,
     _check_numpy_array,
     _hydro1d_dataframe_to_json_dict,
@@ -61,21 +63,11 @@ def write_hydro1d_from_dataframe(
     if os.path.exists(path) and not overwrite:
         raise IOError(f"File {path} already exists")
 
-    if isinstance(data, pd.DataFrame):
-        data = [data]
-    elif isinstance(data, list):
-        if not all(isinstance(df, pd.DataFrame) for df in data):
-            raise TypeError("data must be a DataFrame or a list of DataFrames")
-    else:
-        raise TypeError("data must be a DataFrame or a list of DataFrames")
-
-    for i, df in enumerate(data):
-        if not all(col in df.columns for col in ["time", "density", "radius"]):
-            raise ValueError(f"DataFrame {i} does not contain the necessary columns")
+    data = _check_data_dataframe(data, columns=["time", "density", "radius"])
 
     model_names = _check_model_names(model_names, len(data))
     sources = _check_sources(sources)
-    units = _check_units(units)
+    units = _check_hydro1d_units(units)
 
     hydro = {}
 
@@ -136,13 +128,7 @@ def write_hydro1d_from_dict(
 
     """
 
-    if isinstance(data, dict):
-        data = [data]
-    elif isinstance(data, list):
-        if not all(isinstance(df, dict) for df in data):
-            raise TypeError("data must be a dict or a list of dicts")
-    else:
-        raise TypeError("data must be a dict or a list of dicts")
+    data = _check_data_dict(data)
 
     data_dfs = []
     for i, df in enumerate(data):
@@ -177,7 +163,7 @@ def write_hydro1d_from_numpy(
 ) -> None:
     """
     Write a 1D Hydrodynamical model to a JSON file
-    compatible with the HESMA scheme from a dict.
+    compatible with the HESMA scheme from numpy arrays.
 
     Parameters
     ----------
@@ -263,9 +249,9 @@ def write_hydro1d_from_numpy(
             )
 
     data_dfs = []
-    for i, df in enumerate(radius):
+    for i, r in enumerate(radius):
         data = {
-            "radius": radius[i],
+            "radius": r,
             "density": density[i],
             "time": time[i],
         }
@@ -281,8 +267,7 @@ def write_hydro1d_from_numpy(
             for key in abundances.keys():
                 data[key] = abundances[key][i]
 
-        df = pd.DataFrame(data)
-        data_dfs.append(pd.DataFrame(df))
+        data_dfs.append(pd.DataFrame(data))
 
     write_hydro1d_from_dataframe(
         data_dfs,

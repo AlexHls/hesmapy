@@ -1,7 +1,7 @@
-import json
-from jsonschema import ValidationError, validate
 import plotly.graph_objects as go
 import pandas as pd
+
+from hesmapy.json_base import HesmaBaseJSONFile
 from hesmapy.utils.plot_utils import (
     add_timestep_slider,
     plot_hydro_traces,
@@ -9,83 +9,13 @@ from hesmapy.utils.plot_utils import (
     plot_abundance_traces,
 )
 from hesmapy.hydro.utils import normalize_hydro1d_data, get_abundance_data
-from hesmapy.constants import HYDRO1D_JSON_SCHEMA
+from hesmapy.constants import HYDRO1D_JSON_SCHEMA, ARB_UNIT_STRING
 
 
-class Hydro1D:
+class Hydro1D(HesmaBaseJSONFile):
     def __init__(self, path) -> None:
         self.schema = HYDRO1D_JSON_SCHEMA
-
-        self.path = path
-        self.data = self._load_data()
-
-        # Naively assume that the data is valid
-        self.valid = True
-
-        self.models = []
-        self.multi_model = self._multiple_models()
-
-        self.valid = self._validate_data()
-
-    def _multiple_models(self) -> bool:
-        # This is a hacky way to deal with multiple models and individual
-        # models at the same time
-        if isinstance(self.data, dict):
-            self.models = list(self.data.keys())
-        elif isinstance(self.data, list):
-            for item in self.data:
-                if isinstance(item, dict):
-                    self.models.append(list(item.keys())[0])
-                else:
-                    self.valid = False
-                    break
-            else:
-                # Put all data in a single dict so we don't have to deal with
-                # with a list of dicts
-                data = {}
-                for i, item in enumerate(self.data):
-                    modelname = self.models[i]
-                    # Avoid duplicate keys
-                    if modelname in data:
-                        modelname = f"{modelname}_{i}"
-                    data[modelname] = item[self.models[i]]
-                    self.models[i] = modelname
-                self.data = data
-        else:
-            # This collects all the edge cases I can't think of
-            self.models = []
-            self.valid = False
-        return len(self.models) > 1
-
-    def _load_data(self) -> dict:
-        with open(self.path) as f:
-            try:
-                data = json.load(f)
-            except json.decoder.JSONDecodeError:
-                raise IOError("Invalid JSON file")
-        return data
-
-    def _validate_data(self) -> bool:
-        for model in self.models:
-            try:
-                validate(self.data[model], schema=self.schema)
-            except ValidationError:
-                return False
-
-        # TODO: Check if all data has the same length
-        return True
-
-    def _get_model(self, model: str | int = None) -> str:
-        if model is None:
-            model = self.models[0]
-        elif isinstance(model, int):
-            assert model < len(self.models), "Invalid model index"
-            model = self.models[model]
-        elif isinstance(model, str):
-            assert model in self.models, "Invalid model name"
-        else:
-            raise TypeError("Invalid model type")
-        return model
+        super().__init__(path)
 
     def get_unique_times(self, model: str | int = None) -> list:
         """
@@ -162,37 +92,37 @@ class Hydro1D:
         radius_unit = (
             self.data[model]["units"]["radius"]
             if "radius" in self.data[model]["units"]
-            else "(arb. units)"
+            else ARB_UNIT_STRING
         )
         density_unit = (
             self.data[model]["units"]["density"]
             if "density" in self.data[model]["units"]
-            else "(arb. units)"
+            else ARB_UNIT_STRING
         )
         pressure_unit = (
             self.data[model]["units"]["pressure"]
             if "pressure" in self.data[model]["units"]
-            else "(arb. units)"
+            else ARB_UNIT_STRING
         )
         temperature_unit = (
             self.data[model]["units"]["temperature"]
             if "temperature" in self.data[model]["units"]
-            else "(arb. units)"
+            else ARB_UNIT_STRING
         )
         mass_unit = (
             self.data[model]["units"]["mass"]
             if "mass" in self.data[model]["units"]
-            else "(arb. units)"
+            else ARB_UNIT_STRING
         )
         velocity_unit = (
             self.data[model]["units"]["velocity"]
             if "velocity" in self.data[model]["units"]
-            else "(arb. units)"
+            else ARB_UNIT_STRING
         )
         time_unit = (
             self.data[model]["units"]["time"]
             if "time" in self.data[model]["units"]
-            else "(arb. units)"
+            else ARB_UNIT_STRING
         )
         units = {
             "radius": radius_unit,

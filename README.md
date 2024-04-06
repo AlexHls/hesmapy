@@ -46,7 +46,43 @@ Model files can be written by providing either a ``pd.DataFrame``, ``dict`` or s
 See the documentation for more details.
 
 ### RT
-*(Not yet implemented)*
+
+#### Lightcurves
+This module contains the tools for lightcurves and data derived from them. See below for some basic usage examples.
+
+Loading models:
+```python
+import hesmapy.base as hp
+model = hp.load_rt_lightcurve("examples/rt/rt_lightcurve.json")
+```
+Get the data from a model as a ``pd.DataFrame``:
+```python
+df = model.get_data()
+```
+Plot a model:
+```
+model.plot(show_plot=True)
+```
+
+#### Lightcurves
+This module contains the tools for spectra(l timeseries). See below for some basic usage examples.
+
+Loading models:
+```python
+import hesmapy.base as hp
+model = hp.load_rt_spectrum("examples/rt/rt_spectrum.json")
+```
+Get the data from a model as a list of ``pd.DataFrame`` (one for each timestep):
+```python
+dfs = model.get_data()
+```
+Plot a model:
+```
+model.plot(show_plot=True)``````
+
+
+Model files can be written by providing either a ``pd.DataFrame``, ``dict`` or several ``np.ndarray``.
+See the documentation for more details.
 
 ### Tracer
 *(Not yet implemented)*
