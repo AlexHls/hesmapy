@@ -51,7 +51,7 @@ You can optionally provide additional information such as units, sources etc.:
     write_hydro1d_from_dataframe(
         data,
         "hydro1d.json",
-        model_name="My Model",
+        model_names="My Model",
         units={"radius": "km", "density": "g/cm^3"},
         sources={"bibcode": "2018ApJ...853..107S"},
     )
@@ -113,7 +113,7 @@ You can optionally provide additional information such as units, sources etc. as
         data,
         "lightcurves.json",
         derived_data=derived_data,
-        model_name="My Model",
+        model_names="My Model",
         units={"time": "days", "B": "mag"},
         sources={"bibcode": "2018ApJ...853..107S"},
     )
@@ -176,7 +176,7 @@ You can optionally provide additional information such as units, sources etc.:
         [spec_1, spec_2],
         num_models,
         "spectra.json",
-        model_name="My Model",
+        model_names="My Model",
         units={"wavelength": "Angstrom", "flux": "erg/s/cm^2/Angstrom", "time": "days"},
         sources={"bibcode": "2018ApJ...853..107S"},
     )
